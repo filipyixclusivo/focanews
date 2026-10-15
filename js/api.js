@@ -229,9 +229,12 @@ const API = (() => {
         } catch (e) { /* segue com o espelho local */ }
       }
     }
+    /* Com o Supabase ativo, sessão de demonstração antiga NÃO vale: sem login
+       real, o site pede entrada — assim curtida/comentário nunca cai no limbo
+       local achando que foi para o banco. */
     const u = sbPerfil
       ? { id: sbPerfil.id, nome: sbPerfil.nome, email: sbPerfil.email, papel: sbPerfil.papel, bio: sbPerfil.bio || '', cor: '#2f9dff', ativo: sbPerfil.ativo !== false, criadoEm: sbPerfil.criado_em }
-      : usuarioDemo();
+      : (SB && SB.configurado ? null : usuarioDemo());
     const [rota, buscaStr] = caminho.split('?');
     const q = Object.fromEntries(new URLSearchParams(buscaStr || ''));
     const partes = rota.split('/').filter(Boolean);   // ['api', ...]
