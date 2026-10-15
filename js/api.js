@@ -215,7 +215,23 @@ const API = (() => {
 
   async function demoReq(metodo, caminho, corpoDados) {
     const d = carregarDemo();
-    const u = usuarioDemo();
+    /* ── Supabase: a sessão real (quando configurada) manda no lugar da demo ── */
+    const SB = window.FOCA_DB;
+    let sbPerfil = null;
+    if (SB && SB.configurado && SB.sessao()) {
+      try { sbPerfil = await SB.perfilAtual(); } catch (e) { sbPerfil = null; }
+      if (sbPerfil && !SB.sincronizado) {
+        try {
+          const listas = await SB.minhasListas(sbPerfil.id);
+          d.curtidas[sbPerfil.id] = listas.curtidas;
+          d.salvos[sbPerfil.id] = listas.salvos;
+          gravarDemo(); SB.sincronizado = true;
+        } catch (e) { /* segue com o espelho local */ }
+      }
+    }
+    const u = sbPerfil
+      ? { id: sbPerfil.id, nome: sbPerfil.nome, email: sbPerfil.email, papel: sbPerfil.papel, bio: sbPerfil.bio || '', cor: '#2f9dff', ativo: sbPerfil.ativo !== false, criadoEm: sbPerfil.criado_em }
+      : usuarioDemo();
     const [rota, buscaStr] = caminho.split('?');
     const q = Object.fromEntries(new URLSearchParams(buscaStr || ''));
     const partes = rota.split('/').filter(Boolean);   // ['api', ...]
@@ -223,6 +239,64 @@ const API = (() => {
     const erro = (mensagem, status) => { const e = new Error(mensagem); e.status = status || 400; throw e; };
     const logs = (acao, det) => { d.auditoria.unshift({ id: uid('log-'), quando: agora(), usuario: u ? u.nome : 'sistema', papel: u ? u.papel : '-', acao, detalhe: det || '' }); d.auditoria = d.auditoria.slice(0, 300); };
     const publicados = () => d.artigos.filter(a => a.status === 'publicado');
+
+    /* ── SUPABASE: login real e perfil no banco ── */
+    const montarUsuarioSb = (perfil) => ({
+      id: perfil.id, nome: perfil.nome, email: perfil.email, papel: perfil.papel,
+      bio: perfil.bio || '', cor: '#2f9dff', criadoEm: perfil.criado_em, ativo: perfil.ativo !== false,
+      assinatura: null,
+      preferencias: preferenciasDemo(perfil.id),
+      preferenciasLeitura: { ...prefsLeitura(perfil.id), ...((perfil.preferencias && typeof perfil.preferencias === 'object') ? perfil.preferencias : {}) },
+    });
+    if (SB && SB.configurado) {
+      if (r === 'auth/registro') {
+        const b = corpoDados || {};
+        if (!b.nome || !b.email || !b.senha) erro('Informe nome, e-mail e senha.');
+        if (String(b.senha).length < 6) erro('A senha precisa ter ao menos 6 caracteres.');
+        if (b.papel === 'admin') erro('Contas de administrador são criadas pela própria redação — o cadastro aqui é de leitor.', 403);
+        await SB.registrar(String(b.nome), String(b.email).toLowerCase(), String(b.senha));
+        const perfil = await SB.perfilAtual(true);
+        return { token: (SB.sessao() || {}).access_token, usuario: montarUsuarioSb(perfil) };
+      }
+      if (r === 'auth/login') {
+        const b = corpoDados || {};
+        if (!b.email || !b.senha) erro('Informe e-mail e senha.', 401);
+        await SB.entrar(String(b.email).toLowerCase(), String(b.senha));
+        const perfil = await SB.perfilAtual(true);
+        if (perfil && perfil.ativo === false) { await SB.sairRemoto(); erro('Esta conta está suspensa.', 403); }
+        return { token: (SB.sessao() || {}).access_token, usuario: montarUsuarioSb(perfil) };
+      }
+      if (r === 'auth/sair') {
+        await SB.sairRemoto();
+        estado.token = ''; localStorage.removeItem(CHAVE_TOKEN);
+        return { ok: true };
+      }
+      if (sbPerfil && r === 'eu' && metodo === 'PATCH') {
+        const patch = {};
+        if (corpoDados.nome) patch.nome = String(corpoDados.nome).slice(0, 80);
+        if (corpoDados.bio !== undefined) patch.bio = String(corpoDados.bio).slice(0, 240);
+        const perfil = await SB.atualizarPerfil(patch);
+        return { usuario: montarUsuarioSb(perfil) };
+      }
+      if (sbPerfil && r === 'eu/preferencias' && metodo === 'PATCH') {
+        const atuais = (sbPerfil.preferencias && typeof sbPerfil.preferencias === 'object') ? sbPerfil.preferencias : {};
+        const merged = { ...atuais, ...(corpoDados || {}) };
+        await SB.atualizarPerfil({ preferencias: merged });
+        d.preferencias[u.id] = { ...prefsLeitura(u.id), ...merged }; gravarDemo();
+        return { preferencias: merged };
+      }
+    }
+
+    /* comentários da notícia: Supabase quando ativo, espelho local como reserva */
+    const comentariosDaNoticia = async (aid) => {
+      if (SB && SB.configurado) {
+        try {
+          const l = await SB.comentarios(aid);
+          return l.map(c => ({ ...c, meu: u ? c.autorId === u.id : false }));
+        } catch (e) { /* cai para o espelho local */ }
+      }
+      return d.comentarios.filter(c => c.artigoId === aid && (c.status === 'publicado' || (u && u.papel === 'admin'))).map(c => ({ ...c, meu: u ? c.autorId === u.id : false }));
+    };
 
     /* --- públicos --- */
     if (r === 'saude') return { ok: true, demo: true, artigos: d.artigos.length, fontes: d.fontes.length, usuarios: d.usuarios.length, versao: 'demo' };
@@ -425,25 +499,48 @@ const API = (() => {
             temas: f.temas.map(t => { const info = (TAX().temas || []).find(x => x.id === t) || {}; return { id: t, nome: info.nome, icone: info.icone }; }),
             pesada: f.pesada, geo: f.geo,
           },
-          comentarios: d.comentarios.filter(c => c.artigoId === a.id && (c.status === 'publicado' || (u && u.papel === 'admin'))).map(c => ({ ...c, meu: u ? c.autorId === u.id : false })),
+          comentarios: await comentariosDaNoticia(a.id),
           relacionados: d.artigos.filter(x => x.id !== a.id && x.status === 'publicado' && (x.secao === a.secao || x.fonteId === a.fonteId)).slice(0, 6).map(x => cruzarDemo(x, u)),
         };
       }
       if (acao === 'visualizar') { a.visualizacoes = (a.visualizacoes || 0) + 1; gravarDemo(); return { ok: true }; }
       if (!u) erro('Entre na conta para isso.', 401);
       if (acao === 'curtir') {
+        if (sbPerfil) {
+          const curtidoSb = await SB.alternar('curtidas', u.id, a.id);
+          const lSb = d.curtidas[u.id] || (d.curtidas[u.id] = []);
+          const ix = lSb.indexOf(a.id);
+          if (curtidoSb && ix < 0) lSb.push(a.id);
+          if (!curtidoSb && ix >= 0) lSb.splice(ix, 1);
+          try { a.curtidas = await SB.contar('curtidas', a.id); } catch (e) { /* mantém */ }
+          gravarDemo(); return { curtido: curtidoSb, curtidas: a.curtidas };
+        }
         const lista = d.curtidas[u.id] || (d.curtidas[u.id] = []);
         const i = lista.indexOf(a.id);
         if (i >= 0) { lista.splice(i, 1); a.curtidas = Math.max(0, (a.curtidas || 0) - 1); } else { lista.push(a.id); a.curtidas = (a.curtidas || 0) + 1; }
         gravarDemo(); return { curtido: i < 0, curtidas: a.curtidas };
       }
       if (acao === 'salvar') {
+        if (sbPerfil) {
+          const salvoSb = await SB.alternar('salvos', u.id, a.id);
+          const lSb = d.salvos[u.id] || (d.salvos[u.id] = []);
+          const ix = lSb.indexOf(a.id);
+          if (salvoSb && ix < 0) lSb.push(a.id);
+          if (!salvoSb && ix >= 0) lSb.splice(ix, 1);
+          gravarDemo(); return { salvo: salvoSb };
+        }
         const lista = d.salvos[u.id] || (d.salvos[u.id] = []);
         const i = lista.indexOf(a.id);
         if (i >= 0) lista.splice(i, 1); else lista.push(a.id);
         gravarDemo(); return { salvo: i < 0 };
       }
       if (acao === 'comentar') {
+        if (sbPerfil) {
+          const textoSb = String((corpoDados || {}).texto || '').trim();
+          if (textoSb.length < 2) erro('Escreva um comentário.');
+          const novoSb = await SB.comentar(u.id, a.id, u.nome, textoSb.slice(0, 800));
+          return { comentario: novoSb };
+        }
         const texto = String((corpoDados || {}).texto || '').trim();
         if (texto.length < 2) erro('Escreva um comentário.');
         const c = { id: uid('c-'), artigoId: a.id, autorId: u.id, autor: u.nome, cor: u.cor, texto: texto.slice(0, 800), status: d.config.moderacaoComentarios ? 'pendente' : 'publicado', criadoEm: agora() };
@@ -453,6 +550,7 @@ const API = (() => {
     }
 
     if (r.startsWith('comentario/') && metodo === 'DELETE') {
+      if (sbPerfil) { await SB.apagarComentario(r.split('/')[1]); return { ok: true }; }
       const id = r.split('/')[1];
       const c = G.lista(d.comentarios).find(x => x.id === id);
       if (!c) erro('Comentário não encontrado.', 404);
