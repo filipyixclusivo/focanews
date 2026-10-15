@@ -102,7 +102,7 @@ body.acabamento-papel .linha-frescor,body.modo-leitura .linha-frescor{color:#4a4
 .resumo-dia .mono{color:var(--amarelo-fosco);margin-right:.4rem}
 .boletins{display:grid;gap:.45rem;margin-top:1rem;border-top:1px solid #b9b3a1;padding-top:.8rem}
 .boletins label{display:flex;gap:.5rem;align-items:center;font-size:.88rem;cursor:pointer}
-.boletins input{width:17px;height:17px;accent-color:#929e8a}
+.boletins input{width:17px;height:17px;accent-color:#2f9dff}
 .barras-h{display:grid;gap:.5rem}
 .barras-h>div{display:grid;grid-template-columns:130px 1fr 34px;gap:.6rem;align-items:center;font-size:.82rem}
 .barras-h i{display:block;height:9px;background:var(--amarelo);min-width:4px}

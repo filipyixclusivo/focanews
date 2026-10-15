@@ -17,7 +17,7 @@ body.acabamento-imersivo{
   --borda-forte:rgba(255,255,255,.18);
   --texto:#f2efe6;
   --texto-fraco:rgba(240,237,230,.68);
-  --brilho:0 0 0 1px rgba(146,158,138,0);
+  --brilho:0 0 0 1px rgba(47,157,255,0);
   --raio:16px;
   --raio-g:22px;
   --profundidade:
@@ -33,13 +33,13 @@ body.acabamento-imersivo{
 /* ══════════════════ 1 · CENA DE FUNDO (profundidade ambiente) ══════════════════ */
 .cena{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;
   background:
-    radial-gradient(1200px 700px at 78% -10%, rgba(146,158,138,.10), transparent 62%),
+    radial-gradient(1200px 700px at 78% -10%, rgba(47,157,255,.10), transparent 62%),
     radial-gradient(900px 620px at 8% 8%, rgba(90,120,255,.10), transparent 60%),
     linear-gradient(180deg,#07070a 0%, #0a0a0f 42%, #0b0b10 74%, #06060a 100%);
 }
 .cena-aurora{position:absolute;border-radius:50%;opacity:.5;will-change:transform}
 .cena-aurora.a1{width:64vw;height:64vw;left:-14vw;top:-18vw;
-  background:radial-gradient(circle at center, rgba(146,158,138,.30), rgba(146,158,138,0) 66%)}
+  background:radial-gradient(circle at center, rgba(47,157,255,.30), rgba(47,157,255,0) 66%)}
 .cena-aurora.a2{width:56vw;height:56vw;right:-12vw;top:16vh;
   background:radial-gradient(circle at center, rgba(120,92,255,.26), rgba(120,92,255,0) 68%)}
 .cena-aurora.a3{width:70vw;height:70vw;left:24vw;bottom:-30vw;
@@ -57,7 +57,7 @@ body.acabamento-imersivo{
 }
 /* brilho que segue o cursor (só ponteiro fino) */
 .cena-brilho{position:fixed;left:0;top:0;width:620px;height:620px;margin:-310px 0 0 -310px;z-index:1;
-  background:radial-gradient(circle at center, rgba(146,158,138,.16), rgba(146,158,138,0) 62%);
+  background:radial-gradient(circle at center, rgba(47,157,255,.16), rgba(47,157,255,0) 62%);
   opacity:0;transition:opacity .5s ease;will-change:transform;pointer-events:none}
 body.tem-ponteiro .cena-brilho{opacity:.85}
 .cena-veu{position:absolute;inset:0;
@@ -89,10 +89,10 @@ body.acabamento-imersivo:not(.modo-leitura) .cabecalho-linha{padding:.75rem 0 .6
 body.acabamento-imersivo.rolou:not(.modo-leitura) .cabecalho-linha{padding:.42rem 0 .38rem}
 body.acabamento-imersivo:not(.modo-leitura) .cabecalho::after{
   content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;
-  background:linear-gradient(90deg,transparent,rgba(146,158,138,.55),transparent);opacity:0;transition:opacity .4s}
+  background:linear-gradient(90deg,transparent,rgba(47,157,255,.55),transparent);opacity:0;transition:opacity .4s}
 body.acabamento-imersivo.rolou:not(.modo-leitura) .cabecalho::after{opacity:1}
 
-body.acabamento-imersivo:not(.modo-leitura) .marca-grid{filter:drop-shadow(0 4px 10px rgba(146,158,138,.35))}
+body.acabamento-imersivo:not(.modo-leitura) .marca-grid{filter:drop-shadow(0 4px 10px rgba(47,157,255,.35))}
 body.acabamento-imersivo:not(.modo-leitura) .marca-texto strong{color:var(--texto)}
 body.acabamento-imersivo:not(.modo-leitura) .marca-texto em{color:var(--amarelo);opacity:.85;letter-spacing:.3em}
 body.acabamento-imersivo:not(.modo-leitura) .marca{transition:transform .3s}
@@ -102,7 +102,7 @@ body.acabamento-imersivo:not(.modo-leitura) .busca{
   border:1px solid var(--borda-forte);background:rgba(255,255,255,.05);border-radius:999px;
   overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,.06);transition:border-color .2s, box-shadow .2s;
 }
-body.acabamento-imersivo:not(.modo-leitura) .busca:focus-within{border-color:rgba(146,158,138,.6);box-shadow:0 0 0 4px rgba(146,158,138,.12)}
+body.acabamento-imersivo:not(.modo-leitura) .busca:focus-within{border-color:rgba(47,157,255,.6);box-shadow:0 0 0 4px rgba(47,157,255,.12)}
 body.acabamento-imersivo:not(.modo-leitura) .busca input{color:var(--texto)}
 body.acabamento-imersivo:not(.modo-leitura) .busca input::placeholder{color:rgba(240,237,230,.42)}
 body.acabamento-imersivo:not(.modo-leitura) .busca button{background:var(--amarelo);color:#0a0a0a;border-radius:999px;margin:4px;padding:0 1rem}
@@ -117,13 +117,13 @@ body.acabamento-imersivo:not(.modo-leitura) .nav-secoes a{
   border:1px solid transparent;transition:color .2s, background .2s, border-color .2s, transform .2s;
 }
 body.acabamento-imersivo:not(.modo-leitura) .nav-secoes a:hover{background:rgba(255,255,255,.08);color:#fff;border-color:var(--borda);transform:translateY(-1px)}
-body.acabamento-imersivo:not(.modo-leitura) .nav-secoes a.ativo{background:linear-gradient(180deg,rgba(146,158,138,.22),rgba(146,158,138,.10));color:var(--amarelo);border-color:rgba(146,158,138,.45)}
+body.acabamento-imersivo:not(.modo-leitura) .nav-secoes a.ativo{background:linear-gradient(180deg,rgba(47,157,255,.22),rgba(47,157,255,.10));color:var(--amarelo);border-color:rgba(47,157,255,.45)}
 body.acabamento-imersivo:not(.modo-leitura) .nav-secoes a.ativo::after{display:none}
 
 /* ticker: faixa de vidro com varredura de luz */
 body.acabamento-imersivo:not(.modo-leitura) .ticker{
-  background:linear-gradient(90deg,rgba(146,158,138,.14),rgba(146,158,138,.03) 42%,rgba(255,255,255,.03));
-  background-image:linear-gradient(90deg,rgba(146,158,138,.14),rgba(146,158,138,.03) 42%,rgba(255,255,255,.03));
+  background:linear-gradient(90deg,rgba(47,157,255,.14),rgba(47,157,255,.03) 42%,rgba(255,255,255,.03));
+  background-image:linear-gradient(90deg,rgba(47,157,255,.14),rgba(47,157,255,.03) 42%,rgba(255,255,255,.03));
   color:var(--texto);border-bottom:1px solid var(--borda);position:relative;overflow:hidden;
 }
 body.acabamento-imersivo:not(.modo-leitura) .ticker::after{
@@ -140,9 +140,9 @@ body.acabamento-imersivo:not(.modo-leitura) .titulo-secao{
 }
 body.acabamento-imersivo:not(.modo-leitura) .titulo-secao h2{
   font-family:var(--sans);font-weight:800;letter-spacing:-.03em;
-  background:linear-gradient(92deg,#fff 0%, #cdd3c4 46%, var(--amarelo) 100%);
+  background:linear-gradient(92deg,#fff 0%, #cfeaff 46%, var(--amarelo) 100%);
   -webkit-background-clip:text;background-clip:text;color:transparent;
-  text-shadow:0 12px 34px rgba(146,158,138,.18);
+  text-shadow:0 12px 34px rgba(47,157,255,.18);
 }
 body.acabamento-imersivo:not(.modo-leitura) .kicker{color:var(--amarelo)}
 body.acabamento-imersivo:not(.modo-leitura) .sub{color:var(--texto-fraco)}
@@ -165,8 +165,8 @@ body.acabamento-imersivo:not(.modo-leitura) .recorte.em-3d{
 }
 /* sem ponteiro: só um realce de borda no hover */
 @media (hover:hover){
-  body.acabamento-imersivo:not(.modo-leitura) .recorte:hover{border-color:rgba(146,158,138,.42);
-    box-shadow:var(--profundidade-alta), 0 0 0 1px rgba(146,158,138,.18), 0 0 60px -22px rgba(146,158,138,.55);}
+  body.acabamento-imersivo:not(.modo-leitura) .recorte:hover{border-color:rgba(47,157,255,.42);
+    box-shadow:var(--profundidade-alta), 0 0 0 1px rgba(47,157,255,.18), 0 0 60px -22px rgba(47,157,255,.55);}
 }
 body.acabamento-imersivo:not(.modo-leitura) .recorte::before{
   background-image:var(--meiotom);background-size:4px 4px;opacity:.06;border-radius:var(--raio);
@@ -174,7 +174,7 @@ body.acabamento-imersivo:not(.modo-leitura) .recorte::before{
 /* luz que acompanha o cursor dentro do cartão */
 body.acabamento-imersivo:not(.modo-leitura) .recorte::after{
   content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;
-  background:radial-gradient(360px circle at var(--mx,50%) var(--my,0%), rgba(146,158,138,.16), transparent 62%);
+  background:radial-gradient(360px circle at var(--mx,50%) var(--my,0%), rgba(47,157,255,.16), transparent 62%);
   transition:opacity .35s ease;
 }
 body.tem-ponteiro .recorte.em-3d::after{opacity:1}
@@ -183,7 +183,7 @@ body.acabamento-imersivo:not(.modo-leitura) .recorte.em-3d{transition:transform 
 
 body.acabamento-imersivo:not(.modo-leitura) .recorte-cabeca{border-bottom:1px solid var(--borda);color:var(--texto-fraco)}
 body.acabamento-imersivo:not(.modo-leitura) .recorte h3 a{transition:color .2s}
-body.acabamento-imersivo:not(.modo-leitura) .recorte h3 a:hover{background:linear-gradient(transparent 62%, rgba(146,158,138,.5) 0);color:#fff}
+body.acabamento-imersivo:not(.modo-leitura) .recorte h3 a:hover{background:linear-gradient(transparent 62%, rgba(47,157,255,.5) 0);color:#fff}
 body.acabamento-imersivo:not(.modo-leitura) .recorte-resumo{color:var(--texto-fraco)}
 body.acabamento-imersivo:not(.modo-leitura) .recorte-tempo{color:rgba(240,237,230,.5)}
 body.acabamento-imersivo:not(.modo-leitura) .recorte-rodape{border-top:1px solid var(--borda)}
@@ -195,8 +195,8 @@ body.acabamento-imersivo:not(.modo-leitura) .selos span{border-radius:999px}
 
 /* ── manchete principal: palco com camadas de profundidade ── */
 body.acabamento-imersivo:not(.modo-leitura) .manchete-principal{
-  background:linear-gradient(170deg, rgba(255,255,255,.09), rgba(255,255,255,.028) 55%, rgba(146,158,138,.05));
-  background-image:linear-gradient(170deg, rgba(255,255,255,.09), rgba(255,255,255,.028) 55%, rgba(146,158,138,.05));
+  background:linear-gradient(170deg, rgba(255,255,255,.09), rgba(255,255,255,.028) 55%, rgba(47,157,255,.05));
+  background-image:linear-gradient(170deg, rgba(255,255,255,.09), rgba(255,255,255,.028) 55%, rgba(47,157,255,.05));
   color:var(--texto);border:1px solid var(--borda);border-radius:var(--raio-g);
   box-shadow:var(--profundidade-alta);padding:1.2rem 1.2rem 1.35rem;
   transition:transform .5s cubic-bezier(.22,.61,.36,1), box-shadow .4s ease, border-color .3s;
@@ -206,18 +206,18 @@ body.acabamento-imersivo:not(.modo-leitura) .manchete-principal.em-3d{
 }
 body.acabamento-imersivo:not(.modo-leitura) .manchete-principal::after{
   content:"";position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;opacity:0;
-  background:radial-gradient(520px circle at var(--mx,50%) var(--my,0%), rgba(146,158,138,.20), transparent 60%);
+  background:radial-gradient(520px circle at var(--mx,50%) var(--my,0%), rgba(47,157,255,.20), transparent 60%);
   transition:opacity .4s ease;
 }
 body.tem-ponteiro .manchete-principal.em-3d::after{opacity:1}
 
 body.acabamento-imersivo:not(.modo-leitura) .manchete-principal .chapa{margin-bottom:1rem}
 body.acabamento-imersivo:not(.modo-leitura) .manchete-principal .faixa-urgente{border-radius:999px;
-  background:linear-gradient(90deg,var(--amarelo),#c3cab9);color:#0a0a0a;box-shadow:0 14px 30px -18px rgba(146,158,138,.9)}
+  background:linear-gradient(90deg,var(--amarelo),#c3cab9);color:#0a0a0a;box-shadow:0 14px 30px -18px rgba(47,157,255,.9)}
 body.acabamento-imersivo:not(.modo-leitura) .manchete-principal .recorte-cabeca{border-bottom-color:var(--borda);color:var(--texto-fraco)}
 body.acabamento-imersivo:not(.modo-leitura) .manchete-principal h1{font-family:var(--sans);font-weight:800;
   letter-spacing:-.035em;line-height:1.03;text-wrap:balance}
-body.acabamento-imersivo:not(.modo-leitura) .manchete-principal h1 a:hover{background:linear-gradient(transparent 62%, rgba(146,158,138,.5) 0)}
+body.acabamento-imersivo:not(.modo-leitura) .manchete-principal h1 a:hover{background:linear-gradient(transparent 62%, rgba(47,157,255,.5) 0)}
 body.acabamento-imersivo:not(.modo-leitura) .manchete-principal .olho{color:var(--texto-fraco)}
 
 
@@ -235,7 +235,7 @@ body.acabamento-imersivo:not(.modo-leitura) .coluna-urgente header{border-bottom
 body.acabamento-imersivo:not(.modo-leitura) .coluna-urgente header h3{font-family:var(--sans);font-weight:800;letter-spacing:-.02em}
 body.acabamento-imersivo:not(.modo-leitura) .urgente-lista li{border-bottom:1px solid var(--borda);color:var(--texto)}
 body.acabamento-imersivo:not(.modo-leitura) .urgente-lista .veic{color:var(--texto-fraco)}
-body.acabamento-imersivo:not(.modo-leitura) .urgente-lista a:hover{background:linear-gradient(transparent 60%, rgba(146,158,138,.42) 0)}
+body.acabamento-imersivo:not(.modo-leitura) .urgente-lista a:hover{background:linear-gradient(transparent 60%, rgba(47,157,255,.42) 0)}
 body.acabamento-imersivo:not(.modo-leitura) .urgente-lista .num{color:var(--amarelo)}
 
 body.acabamento-imersivo:not(.modo-leitura) .faixa-veiculos{border-top:1px solid var(--borda);border-bottom:1px solid var(--borda)}
@@ -248,7 +248,7 @@ body.acabamento-imersivo:not(.modo-leitura) .placa-veiculo{
 body.acabamento-imersivo:not(.modo-leitura) .placa-veiculo.em-3d{
   transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));
 }
-body.acabamento-imersivo:not(.modo-leitura) .placa-veiculo:hover{background:linear-gradient(180deg, rgba(146,158,138,.16), rgba(255,255,255,.03));border-color:rgba(146,158,138,.4);transform:perspective(900px) translateY(-6px) scale(1.02)}
+body.acabamento-imersivo:not(.modo-leitura) .placa-veiculo:hover{background:linear-gradient(180deg, rgba(47,157,255,.16), rgba(255,255,255,.03));border-color:rgba(47,157,255,.4);transform:perspective(900px) translateY(-6px) scale(1.02)}
 body.acabamento-imersivo:not(.modo-leitura) .placa-veiculo .pv-nome{border-bottom-color:var(--borda-forte);color:#fff}
 body.acabamento-imersivo:not(.modo-leitura) .placa-veiculo .pv-topo,body.acabamento-imersivo:not(.modo-leitura) .placa-veiculo .pv-pe{color:var(--texto-fraco)}
 body.acabamento-imersivo:not(.modo-leitura) .placa-veiculo .pv-titulo{color:var(--texto-fraco)}
@@ -268,7 +268,7 @@ body.acabamento-imersivo:not(.modo-leitura) .chapa::after{opacity:.09}
 body.acabamento-imersivo:not(.modo-leitura) .chapa::before{background:linear-gradient(180deg, rgba(0,0,0,.35), transparent 40%, rgba(0,0,0,.45))}
 body.acabamento-imersivo:not(.modo-leitura) .recorte:hover .chapa img,
 body.acabamento-imersivo:not(.modo-leitura) .manchete-principal:hover .chapa img{transform:scale(1.045)}
-body.acabamento-imersivo:not(.modo-leitura) .recorte:hover .chapa{box-shadow:inset 0 0 0 1px rgba(146,158,138,.28), 0 30px 54px -28px rgba(0,0,0,1)}
+body.acabamento-imersivo:not(.modo-leitura) .recorte:hover .chapa{box-shadow:inset 0 0 0 1px rgba(47,157,255,.28), 0 30px 54px -28px rgba(0,0,0,1)}
 body.acabamento-imersivo:not(.modo-leitura) .chapa figcaption{background:linear-gradient(0deg, rgba(6,6,9,.92), rgba(6,6,9,0));font-style:normal}
 body.acabamento-imersivo:not(.modo-leitura) .chapa-pequena{border-radius:10px}
 body.acabamento-imersivo:not(.modo-leitura) .faixa-chapa{border-radius:999px;padding:.2rem .6rem}
@@ -280,9 +280,9 @@ body.acabamento-imersivo:not(.modo-leitura) .btn{
   transform:translate3d(var(--bx,0), var(--by,0), 0);
 }
 body.acabamento-imersivo:not(.modo-leitura) .btn:hover{transform:translate3d(var(--bx,0), calc(var(--by,0px) - 2px), 0)}
-body.acabamento-imersivo:not(.modo-leitura) .btn-amarelo{background:linear-gradient(180deg,#b8bfb0,var(--amarelo));color:#0a0a0a;border-color:transparent;
-  box-shadow:0 14px 30px -16px rgba(146,158,138,.75)}
-body.acabamento-imersivo:not(.modo-leitura) .btn-amarelo:hover{background:linear-gradient(180deg,#fff,#cdd3c4);color:#0a0a0a}
+body.acabamento-imersivo:not(.modo-leitura) .btn-amarelo{background:linear-gradient(180deg,#9fd8ff,var(--amarelo));color:#0a0a0a;border-color:transparent;
+  box-shadow:0 14px 30px -16px rgba(47,157,255,.75)}
+body.acabamento-imersivo:not(.modo-leitura) .btn-amarelo:hover{background:linear-gradient(180deg,#fff,#cfeaff);color:#0a0a0a}
 body.acabamento-imersivo:not(.modo-leitura) .btn-tinta{background:rgba(255,255,255,.09);color:#fff;border-color:var(--borda-forte)}
 body.acabamento-imersivo:not(.modo-leitura) .btn-tinta:hover{background:var(--amarelo);color:#0a0a0a}
 body.acabamento-imersivo:not(.modo-leitura) .btn-vazio:hover,body.acabamento-imersivo:not(.modo-leitura) .btn-fantasma:hover{
@@ -298,9 +298,9 @@ body.acabamento-imersivo:not(.modo-leitura) .chip,body.acabamento-imersivo:not(.
   border-radius:999px;border-color:var(--borda-forte);color:var(--texto-fraco);background:rgba(255,255,255,.04);
   transition:transform .2s, background .2s, color .2s, border-color .2s}
 body.acabamento-imersivo:not(.modo-leitura) .chip:hover,body.acabamento-imersivo:not(.modo-leitura) .chip-tema:hover,body.acabamento-imersivo:not(.modo-leitura) .chip-vigiar:hover{
-  color:var(--amarelo);border-color:rgba(146,158,138,.5);background:rgba(146,158,138,.08);transform:translateY(-1px)}
+  color:var(--amarelo);border-color:rgba(47,157,255,.5);background:rgba(47,157,255,.08);transform:translateY(-1px)}
 body.acabamento-imersivo:not(.modo-leitura) .chip.ativo,body.acabamento-imersivo:not(.modo-leitura) .chip-vigiar.ativo,body.acabamento-imersivo:not(.modo-leitura) .chip-tema.ativo{
-  background:linear-gradient(180deg,#b8bfb0,var(--amarelo));color:#0a0a0a;border-color:transparent}
+  background:linear-gradient(180deg,#9fd8ff,var(--amarelo));color:#0a0a0a;border-color:transparent}
 
 body.acabamento-imersivo:not(.modo-leitura) .barra-edicao{
   background:linear-gradient(90deg, rgba(255,255,255,.07), rgba(255,255,255,.02));
@@ -336,14 +336,14 @@ body.acabamento-imersivo :is(.cartao-categoria,.cartao-tema,.cartao-origem,.cart
   transform-style:preserve-3d;
 }
 body.acabamento-imersivo :is(.cartao-categoria,.cartao-tema,.cartao-origem,.cartao-exibicao,.opcao-fonte,.opcao-radio):hover{
-  border-color:rgba(146,158,138,.45)}
+  border-color:rgba(47,157,255,.45)}
 body.acabamento-imersivo:not(.modo-leitura) .cartao-categoria::after{border-top-color:var(--amarelo);opacity:1}
 body.acabamento-imersivo:not(.modo-leitura) .cartao-tema.vigiado,body.acabamento-imersivo:not(.modo-leitura) .opcao-fonte.marcada,
 body.acabamento-imersivo:not(.modo-leitura) .opcao-radio.marcada,body.acabamento-imersivo:not(.modo-leitura) .opcao-check.marcada,
 body.acabamento-imersivo:not(.modo-leitura) .cartao-origem.escolhido,body.acabamento-imersivo:not(.modo-leitura) .cartao-exibicao.escolhido,
 body.acabamento-imersivo:not(.modo-leitura) .cep-resultado.ok{
-  background:linear-gradient(180deg, rgba(146,158,138,.22), rgba(146,158,138,.07));
-  border-color:rgba(146,158,138,.55);box-shadow:0 0 0 1px rgba(146,158,138,.18), var(--profundidade)}
+  background:linear-gradient(180deg, rgba(47,157,255,.22), rgba(47,157,255,.07));
+  border-color:rgba(47,157,255,.55);box-shadow:0 0 0 1px rgba(47,157,255,.18), var(--profundidade)}
 body.acabamento-imersivo:not(.modo-leitura) .opcao-radio b,body.acabamento-imersivo:not(.modo-leitura) .bloco-pref h4,
 body.acabamento-imersivo:not(.modo-leitura) .cartao-categoria .cc-nome,body.acabamento-imersivo:not(.modo-leitura) .contador-fontes{color:var(--texto)}
 body.acabamento-imersivo:not(.modo-leitura) .opcao-radio small,body.acabamento-imersivo:not(.modo-leitura) .opcao-check small,
@@ -362,7 +362,7 @@ body.acabamento-imersivo textarea{
   background:rgba(0,0,0,.35);border:1px solid var(--borda-forte);border-radius:10px;color:var(--texto);
   transition:border-color .2s, box-shadow .2s}
 body.acabamento-imersivo input:focus,body.acabamento-imersivo select:focus,body.acabamento-imersivo textarea:focus{
-  outline:none;border-color:rgba(146,158,138,.6);box-shadow:0 0 0 4px rgba(146,158,138,.12)}
+  outline:none;border-color:rgba(47,157,255,.6);box-shadow:0 0 0 4px rgba(47,157,255,.12)}
 body.acabamento-imersivo:not(.modo-leitura) .form-comentario textarea{background:rgba(0,0,0,.35);border-color:var(--borda-forte);color:var(--texto);border-radius:12px}
 
 /* ══════════════════ 7 · MODAIS, AVISOS, RODAPÉ ══════════════════ */
@@ -376,8 +376,8 @@ body.acabamento-imersivo:not(.modo-leitura) .painel-modal{
 body.acabamento-imersivo:not(.modo-leitura) .painel-auth{max-width:520px}
 body.acabamento-imersivo:not(.modo-leitura) .perfil{border-radius:var(--raio);border-color:var(--borda);
   background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));transition:transform .25s, border-color .25s}
-body.acabamento-imersivo:not(.modo-leitura) .perfil:hover{transform:translateY(-3px);border-color:rgba(146,158,138,.45)}
-body.acabamento-imersivo:not(.modo-leitura) .perfil.ativo{border-color:var(--amarelo);background:linear-gradient(180deg, rgba(146,158,138,.2), rgba(146,158,138,.06))}
+body.acabamento-imersivo:not(.modo-leitura) .perfil:hover{transform:translateY(-3px);border-color:rgba(47,157,255,.45)}
+body.acabamento-imersivo:not(.modo-leitura) .perfil.ativo{border-color:var(--amarelo);background:linear-gradient(180deg, rgba(47,157,255,.2), rgba(47,157,255,.06))}
 body.acabamento-imersivo:not(.modo-leitura) .toast{
   border-radius:14px;border:1px solid var(--borda-forte);background:rgba(16,16,20,.96);
   backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:var(--texto);
@@ -411,7 +411,7 @@ body.acabamento-imersivo:not(.modo-leitura) .pagina-jornal{
 }
 body.acabamento-imersivo:not(.modo-leitura) .pagina-jornal::before{
   content:"";position:absolute;inset:-40px -30px auto;height:60px;border-radius:50%;
-  background:radial-gradient(60% 100% at 50% 100%, rgba(146,158,138,.22), transparent 70%);
+  background:radial-gradient(60% 100% at 50% 100%, rgba(47,157,255,.22), transparent 70%);
   filter:blur(6px);pointer-events:none;
 }
 /* Folha clara, tinta preta: o tema imersivo é escuro, mas a página do jornal
@@ -468,18 +468,18 @@ body.acabamento-imersivo:not(.modo-leitura) .abas,body.acabamento-imersivo:not(.
 body.acabamento-imersivo:not(.modo-leitura) .abas{display:flex;gap:.4rem;flex-wrap:wrap;border:0;background:transparent}
 body.acabamento-imersivo:not(.modo-leitura) .abas button{
   border:1px solid var(--borda);background:rgba(255,255,255,.05);color:var(--texto-fraco);padding:.45rem .95rem}
-body.acabamento-imersivo:not(.modo-leitura) .abas button.ativo{background:linear-gradient(180deg,#b8bfb0,var(--amarelo));color:#0a0a0a;border-color:transparent}
+body.acabamento-imersivo:not(.modo-leitura) .abas button.ativo{background:linear-gradient(180deg,#9fd8ff,var(--amarelo));color:#0a0a0a;border-color:transparent}
 body.acabamento-imersivo:not(.modo-leitura) .cartao-perfil{border-radius:var(--raio-g);box-shadow:var(--profundidade)}
 
 /* ══════════════════ 9 · PAINEL DA REDAÇÃO ══════════════════ */
 body.acabamento-imersivo:not(.modo-leitura) .admin-cabecalho,body.acabamento-imersivo:not(.modo-leitura) .abas-admin{
   border:1px solid var(--borda);border-radius:var(--raio);background:rgba(255,255,255,.05)}
 body.acabamento-imersivo:not(.modo-leitura) .abas-admin button{border-radius:999px}
-body.acabamento-imersivo:not(.modo-leitura) .abas-admin button.ativo{background:linear-gradient(180deg,#b8bfb0,var(--amarelo));color:#0a0a0a}
+body.acabamento-imersivo:not(.modo-leitura) .abas-admin button.ativo{background:linear-gradient(180deg,#9fd8ff,var(--amarelo));color:#0a0a0a}
 body.acabamento-imersivo:not(.modo-leitura) .tabela th{color:var(--amarelo);border-bottom-color:var(--borda-forte)}
 body.acabamento-imersivo:not(.modo-leitura) .tabela td,body.acabamento-imersivo:not(.modo-leitura) .tabela tr{border-color:var(--borda)}
 body.acabamento-imersivo:not(.modo-leitura) .etiqueta{border-radius:999px}
-body.acabamento-imersivo:not(.modo-leitura) .barras .barra i{background:linear-gradient(180deg,#b8bfb0,var(--amarelo))}
+body.acabamento-imersivo:not(.modo-leitura) .barras .barra i{background:linear-gradient(180deg,#9fd8ff,var(--amarelo))}
 body.acabamento-imersivo:not(.modo-leitura) .miniatura img{border-radius:8px}
 
 /* ══════════════════ 10 · ANIMAÇÕES DE ENTRADA E TROCA DE ROTA ══════════════════ */
@@ -557,7 +557,7 @@ body.acabamento-imersivo.modo-leitura .cena-aurora,body.acabamento-imersivo.modo
 body.acabamento-imersivo.modo-leitura .cena-veu{display:none}
 body.acabamento-imersivo.modo-leitura .recorte:hover{transform:none}
 body.acabamento-imersivo.modo-leitura .cena-brilho{display:none}
-body.acabamento-imersivo.modo-leitura .progresso-leitura{background:linear-gradient(90deg,#737e67,var(--amarelo))}
+body.acabamento-imersivo.modo-leitura .progresso-leitura{background:linear-gradient(90deg,#1668b8,var(--amarelo))}
 
 
 /* ══════════════════ 13 · CELULAR: nada de estouro de largura ══════════════════ */

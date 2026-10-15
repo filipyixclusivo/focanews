@@ -39,8 +39,8 @@
     const cochichos = coletarCochichos(pagina);
     /* corpo em camadas de papel (extrusão) + frente nítida + jornal solto à frente */
     const camadas = Array.from({ length: CAMADAS }, (_, k) => CAMADAS - k).map((i) =>
-      `<img class="fl ext" style="--i:${i}" src="/img/foca-extrusao.png" alt="" draggable="false">`).join('') +
-      `<img class="fl frente" style="--i:0" src="/img/foca-frente.png" alt="" draggable="false">`;
+      `<img class="fl ext emblema" style="--i:${i}" src="/img/logo-nova.png" alt="" draggable="false">`).join('') +
+      `<img class="fl frente emblema" style="--i:0" src="/img/logo-nova.png" alt="" draggable="false">`;
 
     const palco = document.createElement('section');
     palco.className = 'foca-palco';
@@ -52,20 +52,19 @@
             <span class="foca-sombra"></span>
             ${camadas}
             <span class="onda o1"></span><span class="onda o2"></span><span class="onda o3"></span>
-            <div class="jornal-camada"><img src="/img/foca-jornal.png" alt="" draggable="false"></div>
-            <span class="psiu">psiu!</span>
+            <span class="psiu"><i></i>ao vivo</span>
           </div>
         </div>
       </div>
       <div class="foca-texto">
-        <span class="foca-etiqueta">fofoca, mas com fonte</span>
+        <span class="foca-etiqueta">Jornalismo com fonte verificada</span>
         <h2>Foca no que <em>tá rolando.</em></h2>
-        <p class="foca-sub">Se virou assunto, a Foca tá de olho.</p>
+        <p class="foca-sub">Se virou assunto, a Foca tá de olho — edição contínua, direto das redações.</p>
         ${cochichos.length ? `
         <div class="cochicho" aria-live="polite">
-          <span class="cochicho-rotulo"><i></i>a foca ouviu…</span>
+          <span class="cochicho-rotulo"><i></i>em destaque na capa</span>
           <a class="cochicho-texto" href="#/"></a>
-          <div class="cochicho-pe"><span class="cochicho-fonte"></span><button type="button" class="cochicho-outro">outro cochicho ↻</button></div>
+          <div class="cochicho-pe"><span class="cochicho-fonte"></span><button type="button" class="cochicho-outro">próximo destaque →</button></div>
         </div>` : ''}
       </div>`;
     pagina.insertBefore(palco, pagina.firstChild);

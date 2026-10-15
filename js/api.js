@@ -134,7 +134,7 @@ const API = (() => {
       fontes: G.fontes(s.fontes).map(f => ({ ...f, ativa: true, ultimaSync: null, ultimoStatus: 'semente', totalImportado: 0 })),
       /* No modo demonstração (servidor fora do ar) a senha é a convenção do sandbox;
          aqui o que importa é o papel e o e-mail das contas de administração. */
-      usuarios: ADMIN_PADRAO.map(u => ({ ...u, papel: 'admin', cor: '#929e8a', bio: 'Redação — curadoria da primeira página.', ativo: true, criadoEm: agora(), senha: 'demo' })),
+      usuarios: ADMIN_PADRAO.map(u => ({ ...u, papel: 'admin', cor: '#2f9dff', bio: 'Redação — curadoria da primeira página.', ativo: true, criadoEm: agora(), senha: 'demo' })),
       sessoes: {}, comentarios: [], salvos: {}, curtidas: {}, lidas: {}, auditoria: [], demo: true, versao: 4,
       preferencias: {
         'u-admin': { ...(TAX().preferenciasPadrao || {}) },
@@ -485,7 +485,7 @@ const API = (() => {
       if (String(b.senha).length < 6) erro('A senha precisa ter ao menos 6 caracteres.');
       if (b.papel === 'admin') erro('Contas de administrador são criadas pela própria redação — o cadastro aqui é de leitor.', 403);
       if (d.usuarios.some(x => x.email === String(b.email).toLowerCase())) erro('Este e-mail já tem conta.', 409);
-      const novo = { id: uid('u-'), nome: b.nome, email: String(b.email).toLowerCase(), papel: 'leitor', bio: '', cor: ['#929e8a', '#e8e3d7', '#9a9a9a'][d.usuarios.length % 3], ativo: true, criadoEm: agora(), senha: await hashSenha(b.senha) };
+      const novo = { id: uid('u-'), nome: b.nome, email: String(b.email).toLowerCase(), papel: 'leitor', bio: '', cor: ['#2f9dff', '#e8e3d7', '#9a9a9a'][d.usuarios.length % 3], ativo: true, criadoEm: agora(), senha: await hashSenha(b.senha) };
       d.usuarios.push(novo);
       d.preferencias[novo.id] = { ...(TAX().preferenciasPadrao || {}), ...(b.preferencias || {}) };
       const token = uid('tk-');
@@ -690,7 +690,7 @@ const API = (() => {
       if (r === 'admin/usuarios' && metodo === 'POST') {
         if (d.usuarios.some(x => x.email === String(corpoDados.email).toLowerCase())) erro('E-mail já cadastrado.', 409);
         if (corpoDados.papel === 'admin' && adminsEm(d.usuarios) >= LIMITE_ADMINS) erro(`O portal tem ${LIMITE_ADMINS} contas de administrador — rebaixe uma antes de criar outra.`, 403);
-        const novo = { id: uid('u-'), nome: corpoDados.nome, email: String(corpoDados.email).toLowerCase(), papel: corpoDados.papel === 'admin' ? 'admin' : 'leitor', bio: corpoDados.bio || '', cor: '#929e8a', ativo: true, criadoEm: agora(), senha: await hashSenha(corpoDados.senha || 'demo1234') };
+        const novo = { id: uid('u-'), nome: corpoDados.nome, email: String(corpoDados.email).toLowerCase(), papel: corpoDados.papel === 'admin' ? 'admin' : 'leitor', bio: corpoDados.bio || '', cor: '#2f9dff', ativo: true, criadoEm: agora(), senha: await hashSenha(corpoDados.senha || 'demo1234') };
         d.usuarios.push(novo); logs('criou usuário', `${novo.email} (${novo.papel})`); gravarDemo();
         return { usuario: publicoDemo(novo) };
       }
@@ -748,7 +748,7 @@ const API = (() => {
     } catch (e) {
       estado.demo = true;
       carregarDemo();
-      console.info('%cFoca News · modo demonstração (servidor offline)','color:#929e8a');
+      console.info('%cFoca News · modo demonstração (servidor offline)','color:#2f9dff');
     }
 
     /* O bootstrap é a espinha dorsal da página. Se ele vier vazio, parcial ou

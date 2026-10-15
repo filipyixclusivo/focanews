@@ -515,7 +515,7 @@ const Admin = (() => {
             <thead><tr><th>Leitor</th><th>Comentário</th><th>Matéria</th><th>Situação</th><th>Quando</th><th>Ações</th></tr></thead>
             <tbody>
               ${d.itens.map(c => `<tr>
-                <td style="white-space:nowrap"><span class="avatar" style="width:24px;height:24px;font-size:.7rem;display:inline-grid;vertical-align:middle;background:${esc(c.cor || '#929e8a')}">${esc((c.autor || '?')[0].toUpperCase())}</span> ${esc(c.autor)}</td>
+                <td style="white-space:nowrap"><span class="avatar" style="width:24px;height:24px;font-size:.7rem;display:inline-grid;vertical-align:middle;background:${esc(c.cor || '#2f9dff')}">${esc((c.autor || '?')[0].toUpperCase())}</span> ${esc(c.autor)}</td>
                 <td style="max-width:420px">${esc(c.texto)}</td>
                 <td style="max-width:260px"><a href="#/noticia/${c.artigoId}"><span class="mono">${esc((c.titulo || '').slice(0, 70))}</span></a></td>
                 <td><span class="etiqueta ${c.status}">${c.status}</span></td>

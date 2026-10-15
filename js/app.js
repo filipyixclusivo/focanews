@@ -132,7 +132,7 @@ const App = (() => {
       </span>`;
 
     if (!u) {
-      topo.innerHTML = (E.demo ? '<span style="color:#737e67">modo demonstração</span>' : 'edição de ' + new Date().toLocaleDateString('pt-BR')) + regiao;
+      topo.innerHTML = (E.demo ? '<span style="color:#1668b8">modo demonstração</span>' : 'edição de ' + new Date().toLocaleDateString('pt-BR')) + regiao;
       /* Cadastro aberto é de leitor (sem limite). Administrador entra por "Entrar". */
       area.innerHTML = `${modoBtn}${acabamentoBtn}${exibicaoBtn}
         <button class="btn btn-vazio" data-abrir="modal-auth" data-perfil="leitor">Entrar</button>
@@ -1010,7 +1010,7 @@ const App = (() => {
             <div id="listaComentarios">
               ${G.lista(d.comentarios).length ? G.lista(d.comentarios).map(c => `
                 <div class="comentario" data-coment="${c.id}">
-                  <span class="avatar" style="background:${esc(c.cor || '#929e8a')}">${esc((c.autor || '?')[0].toUpperCase())}</span>
+                  <span class="avatar" style="background:${esc(c.cor || '#2f9dff')}">${esc((c.autor || '?')[0].toUpperCase())}</span>
                   <div style="flex:1">
                     <div class="comentario-cabeca">
                       <b>${esc(c.autor)}</b>
@@ -1072,7 +1072,7 @@ const App = (() => {
           <span class="contagem">${lista.length} jornais, agências, emissoras e portais · ${paises.length} países</span>
           <span class="empurra"><a class="link-tudo" href="#/minhas-fontes">Escolher minhas fontes →</a></span>
         </div>
-        <p class="sub lede-catalogo">A banca completa do Foca News: imprensa regional brasileira, jornais nacionais, agências de checagem e a grande imprensa internacional — cada veículo com nome de praça, região, idioma e site oficial. <b>${comAcervo}</b> já têm matérias no acervo; os demais entram como <b>em integração</b>, sem notícia inventada com assinatura alheia. ${API.estado.demo ? '<b style="color:#737e67">Modo demonstração: rode o servidor para sincronizar os feeds ao vivo.</b>' : ''}</p>
+        <p class="sub lede-catalogo">A banca completa do Foca News: imprensa regional brasileira, jornais nacionais, agências de checagem e a grande imprensa internacional — cada veículo com nome de praça, região, idioma e site oficial. <b>${comAcervo}</b> já têm matérias no acervo; os demais entram como <b>em integração</b>, sem notícia inventada com assinatura alheia. ${API.estado.demo ? '<b style="color:#1668b8">Modo demonstração: rode o servidor para sincronizar os feeds ao vivo.</b>' : ''}</p>
 
         <div class="barra-fontes barra-veiculos">
           <input id="buscaVeiculo" type="search" placeholder="Buscar por veículo, região ou país…" aria-label="Buscar veículo">
