@@ -1,0 +1,17 @@
+# Foca News — site estático (modo demonstração embutido, sem servidor)
+# A cada deploy, busca as manchetes recentes de todos os veículos.
+# --tolerante: se a rede falhar, mantém o acervo já versionado (nunca site vazio).
+[build]
+  command = "node scripts/atualizar-noticias.mjs --tolerante"
+  publish = "."
+
+[[headers]]
+  for = "/img/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"

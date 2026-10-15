@@ -1,0 +1,38 @@
+name: Atualização diária de notícias
+
+# Troca o acervo velho pelas manchetes recentes, todo dia.
+# 07:30 UTC = 04:30 em Brasília — a capa acorda atualizada.
+on:
+  schedule:
+    - cron: "30 7 * * *"
+  workflow_dispatch: {}   # permite rodar na mão, quando quiser
+
+permissions:
+  contents: write
+
+jobs:
+  atualizar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Buscar manchetes recentes de todos os veículos
+        run: node scripts/atualizar-noticias.mjs
+
+      - name: Publicar o acervo novo (se mudou)
+        run: |
+          if git diff --quiet -- data/seed.js; then
+            echo "Nada mudou — acervo de hoje já estava no ar."
+          else
+            git config user.name "Foca News · robô da redação"
+            git config user.email "redacao@focanews.local"
+            git add data/seed.js
+            git commit -m "Notícias do dia: acervo atualizado automaticamente"
+            git push
+          fi
+      # Com o repositório ligado ao Netlify, este commit dispara um deploy
+      # novo sozinho — e o site amanhece com as notícias recentes.

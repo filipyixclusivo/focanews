@@ -1,0 +1,6 @@
+.vercel
+node_modules
+.DS_Store
+*.zip
+*.tmp
+data/seed.js.tmp

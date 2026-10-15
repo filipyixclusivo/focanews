@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Foca News — foca no que tá rolando</title>
+<meta name="description" content="Foca News: notícias do Brasil e do mundo, esportes, tecnologia, games, política, entretenimento e economia em um só lugar. Se virou assunto, a Foca tá de olho.">
+<meta name="theme-color" content="#07070a">
+<link rel="icon" type="image/png" href="/img/favicon-192.png">
+<link rel="apple-touch-icon" href="/img/favicon-192.png"><rect width='32' height='32' fill='%230a0a0a'/><rect x='4' y='4' width='24' height='7' fill='%23929e8a'/><rect x='4' y='14' width='11' height='14' fill='%23f4f1ea'/><rect x='18' y='14' width='10' height='6' fill='%23f4f1ea'/><rect x='18' y='22' width='10' height='6' fill='%23929e8a'/></svg>">
+<link rel="stylesheet" href="/css/estilo.css">
+<link rel="stylesheet" href="/css/3d.css">
+<link rel="stylesheet" href="/css/foca.css">
+<link rel="stylesheet" href="/css/profissional.css">
+</head>
+<body class="acabamento-imersivo ex-padrao">
+<script>
+/* escolhe o acabamento antes da primeira pintura — evita o piscar do tema */
+(function () {
+  try {
+    var p = JSON.parse(localStorage.getItem('grid_prefs') || '{}');
+    var c = ['acabamento-' + (p.acabamento === 'papel' ? 'papel' : 'imersivo')];
+    c.push('ex-' + (['compacto', 'padrao', 'destaque'].indexOf(p.exibicao) >= 0 ? p.exibicao : 'padrao'));
+    if (p.modo === 'leitura') c.push('modo-leitura');
+    if (p.imagens === false) c.push('sem-imagens');
+    document.body.className = c.join(' ');
+  } catch (e) { document.body.className = 'acabamento-imersivo ex-padrao'; }
+})();
+</script>
+
+<!-- ══════════ TOPO INSTITUCIONAL ══════════ -->
+<div class="faixa-topo">
+  <div class="container faixa-topo-linha">
+    <span id="dataHoje">—</span>
+    <span class="faixa-meio">Edição contínua · <b id="fontesAtivas">339</b> veículos no catálogo · <b id="paisesMonitorados">34</b> países</span>
+    <span id="usuarioTopo" class="faixa-usuario"></span>
+  </div>
+</div>
+
+<!-- ══════════ CABEÇALHO ══════════ -->
+<header class="cabecalho">
+  <div class="container cabecalho-linha">
+    <a class="marca marca-foca" href="#/" title="Foca News — foca no que tá rolando">
+      <span class="foca-selo"><img src="/img/foca-icone.png" alt="Foca News" width="60" height="60" decoding="async"></span>
+      <span class="marca-texto">
+        <strong>FOCA</strong>
+        <em>News</em>
+      </span>
+    </a>
+
+    <form class="busca" id="formBusca" role="search">
+      <input id="campoBusca" type="search" placeholder="Buscar nas notícias: economia, guerra, Flamengo, RTX 5090…" autocomplete="off" aria-label="Buscar notícias">
+      <button type="submit" aria-label="Buscar">Buscar</button>
+    </form>
+
+    <div class="cabecalho-acoes" id="areaUsuario">
+      <button class="btn btn-vazio" data-abrir="modal-auth">Entrar</button>
+      <button class="btn btn-amarelo" data-abrir="modal-auth" data-modo="registro">Criar conta</button>
+    </div>
+  </div>
+
+  <nav class="nav-secoes" id="navSecoes" aria-label="Seções"><div class="container nav-rolagem"></div></nav>
+</header>
+
+<!-- ══════════ TICKER ══════════ -->
+<div class="ticker" id="ticker" aria-label="Manchetes em tempo real">
+  <span class="ticker-etiqueta">Psiu!</span>
+  <div class="ticker-trilho" id="tickerTrilho"></div>
+</div>
+
+<!-- ══════════ CONTEÚDO ══════════ -->
+<main id="app" class="container" aria-live="polite"></main>
+
+<!-- ══════════ RODAPÉ ══════════ -->
+<footer class="rodape">
+  <div class="container rodape-grade">
+    <div>
+      <div class="rodape-marca rodape-foca"><img src="/img/foca-logo-512.png" alt="Foca News — foca no que tá rolando" width="150" height="150" loading="lazy"></div>
+      <p id="rodapeTexto" class="rodape-desc"></p>
+      <p class="rodape-mini">Perfis: <b>Administrador</b> (redação, curadoria e moderação) e <b>Leitor</b> (leitura, coleções e comentários).</p>
+    </div>
+    <div>
+      <h4>Seções</h4>
+      <ul class="rodape-lista" id="rodapeSecoes"></ul>
+    </div>
+    <div>
+      <h4>Plataforma</h4>
+      <ul class="rodape-lista">
+        <li><a href="#/veiculos">Veículos monitorados</a></li>
+        <li><a href="#/planos">Planos e assinatura</a></li>
+        <li><a href="#/vip">Área VIP</a></li>
+        <li><a href="#/perfil">Minha conta</a></li>
+        <li><a href="#/admin">Painel da redação</a></li>
+        <li><a href="/api/saude" target="_blank" rel="noopener">Estado do serviço</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Expediente</h4>
+      <ul class="rodape-lista">
+        <li><a href="#/como-conheceu">Como o Foca News chegou até você</a></li>
+        <li><a href="#/exibicao">Modo de exibição</a></li>
+        <li><a href="#/preferencias">Meu jeito de ler</a></li>
+      </ul>
+      <p class="rodape-mini">As manchetes e os textos são agregados dos feeds públicos e pertencem aos respectivos veículos.</p>
+      <p class="rodape-mini">Cada matéria traz o link para a reportagem completa no site de origem.</p>
+    </div>
+  </div>
+  <div class="rodape-base"><div class="container">© <span id="anoAtual"></span> Foca News · a Foca fofoca, mas só com fonte.</div></div>
+</footer>
+
+<!-- ══════════ MODAL DE ACESSO ══════════ -->
+<div class="cortina" id="modal-auth" hidden>
+  <div class="painel-modal painel-auth" role="dialog" aria-modal="true" aria-labelledby="tituloAuth">
+    <button class="fechar" data-fechar aria-label="Fechar">×</button>
+    <div class="auth-cabeca">
+      <span class="selo">Acesso Foca News</span>
+      <h2 id="tituloAuth">Entre na sua edição</h2>
+      <p>Escolha o perfil de acesso. A redação cuida da capa; o leitor monta a própria coleção.</p>
+    </div>
+
+    <div class="perfis">
+      <button class="perfil" data-perfil="leitor">
+        <span class="perfil-icone">📖</span>
+        <strong>Leitor</strong>
+        <small>Ler, salvar, curtir e comentar</small>
+      </button>
+      <button class="perfil" data-perfil="admin">
+        <span class="perfil-icone">🗞️</span>
+        <strong>Administrador</strong>
+        <small>Redação: curadoria, fontes e moderação</small>
+      </button>
+    </div>
+
+    <form id="formAuth" class="form-auth">
+      <div class="campo" id="campoNome" hidden>
+        <label for="authNome">Nome de exibição</label>
+        <input id="authNome" name="nome" autocomplete="name" placeholder="Como você assina os comentários">
+      </div>
+      <div class="campo">
+        <label for="authEmail">E-mail</label>
+        <input id="authEmail" name="email" type="email" required autocomplete="username" placeholder="voce@email.com">
+      </div>
+      <div class="campo">
+        <label for="authSenha">Senha</label>
+        <input id="authSenha" name="senha" type="password" required autocomplete="current-password" placeholder="••••••••">
+      </div>
+      <p class="nota-vagas" id="notaVagas" hidden></p>
+      <div class="aviso-auth" id="avisoAuth" hidden></div>
+      <button class="btn btn-amarelo btn-largo" type="submit" id="btnAuth">Entrar como Leitor</button>
+      <p class="troca-modo">
+        <span id="textoTroca">Ainda não tem conta?</span>
+        <a href="#" id="linkTroca">Criar conta de Leitor</a>
+      </p>
+    </form>
+  </div>
+</div>
+
+<!-- ══════════ MODAL DE ASSINATURA ══════════ -->
+<div class="cortina" id="modal-checkout" hidden>
+  <div class="painel-modal painel-auth" role="dialog" aria-modal="true" aria-labelledby="tituloCheckout">
+    <button class="fechar" data-fechar aria-label="Fechar">×</button>
+    <div id="conteudoCheckout"></div>
+  </div>
+</div>
+
+<!-- ══════════ MODAL DO ARTIGO ══════════ -->
+<div class="cortina" id="modal-artigo" hidden>
+  <div class="painel-modal painel-artigo" role="dialog" aria-modal="true">
+    <button class="fechar" data-fechar aria-label="Fechar">×</button>
+    <div id="conteudoArtigo"></div>
+  </div>
+</div>
+
+<!-- ══════════ MODAL DO EDITOR (ADMIN) ══════════ -->
+<div class="cortina" id="modal-editor" hidden>
+  <div class="painel-modal painel-editor" role="dialog" aria-modal="true">
+    <button class="fechar" data-fechar aria-label="Fechar">×</button>
+    <div id="conteudoEditor"></div>
+  </div>
+</div>
+
+<div class="avisos" id="avisos"></div>
+
+<script src="/data/seed.js" onerror="window.__SEED__=null"></script>
+<script src="/data/taxonomia.js" onerror="window.__TAXONOMIA__=null"></script>
+<script src="/js/guardas.js"></script>
+<script src="/js/api.js"></script>
+<script src="/js/prefs.js"></script>
+<script src="/js/app.js"></script>
+<script src="/js/admin.js"></script>
+<script src="/js/experiencia.js"></script>
+<script src="/js/foca.js"></script>
+</body>
+</html>
