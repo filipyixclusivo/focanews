@@ -1,0 +1,664 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   GRID NOTÍCIAS — CAMADA 3D / EXPERIÊNCIA IMERSIVA
+   Carregada depois de estilo.css. Tudo aqui vive sob body.acabamento-imersivo,
+   então o acabamento "papel" (clássico) continua exatamente como era.
+
+   Princípios de performance:
+   • só `transform`, `opacity` e variáveis CSS são animados (rodam na GPU);
+   • blur (backdrop-filter) fica restrito à moldura do site, nunca sobre listas;
+   • nenhum efeito de ponteiro em telas de toque (body.efeitos-leves);
+   • tudo desligado em prefers-reduced-motion.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+body.acabamento-imersivo{
+  --s1:rgba(255,255,255,.055);
+  --s2:rgba(255,255,255,.085);
+  --borda:rgba(255,255,255,.10);
+  --borda-forte:rgba(255,255,255,.18);
+  --texto:#f2efe6;
+  --texto-fraco:rgba(240,237,230,.68);
+  --brilho:0 0 0 1px rgba(146,158,138,0);
+  --raio:16px;
+  --raio-g:22px;
+  --profundidade:
+    inset 0 1px 0 rgba(255,255,255,.07),
+    0 2px 6px -2px rgba(0,0,0,.7),
+    0 24px 48px -28px rgba(0,0,0,.95);
+  --profundidade-alta:
+    inset 0 1px 0 rgba(255,255,255,.10),
+    0 2px 8px -2px rgba(0,0,0,.75),
+    0 46px 80px -40px rgba(0,0,0,1);
+}
+
+/* ══════════════════ 1 · CENA DE FUNDO (profundidade ambiente) ══════════════════ */
+.cena{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;
+  background:
+    radial-gradient(1200px 700px at 78% -10%, rgba(146,158,138,.10), transparent 62%),
+    radial-gradient(900px 620px at 8% 8%, rgba(90,120,255,.10), transparent 60%),
+    linear-gradient(180deg,#07070a 0%, #0a0a0f 42%, #0b0b10 74%, #06060a 100%);
+}
+.cena-aurora{position:absolute;border-radius:50%;opacity:.5;will-change:transform}
+.cena-aurora.a1{width:64vw;height:64vw;left:-14vw;top:-18vw;
+  background:radial-gradient(circle at center, rgba(146,158,138,.30), rgba(146,158,138,0) 66%)}
+.cena-aurora.a2{width:56vw;height:56vw;right:-12vw;top:16vh;
+  background:radial-gradient(circle at center, rgba(120,92,255,.26), rgba(120,92,255,0) 68%)}
+.cena-aurora.a3{width:70vw;height:70vw;left:24vw;bottom:-30vw;
+  background:radial-gradient(circle at center, rgba(0,196,180,.18), rgba(0,196,180,0) 70%)}
+/* piso em perspectiva: dá a sensação de "mesa" sob os cartões */
+.cena-grade{position:absolute;left:-25%;right:-25%;bottom:-12vh;height:46vh;
+  background-image:
+    repeating-linear-gradient(90deg, rgba(255,255,255,.055) 0 1px, transparent 1px 84px),
+    repeating-linear-gradient(0deg, rgba(255,255,255,.045) 0 1px, transparent 1px 66px);
+  transform:perspective(560px) rotateX(68deg);
+  transform-origin:50% 100%;
+  mask-image:radial-gradient(70% 80% at 50% 100%, #000 0%, transparent 78%);
+  -webkit-mask-image:radial-gradient(70% 80% at 50% 100%, #000 0%, transparent 78%);
+  will-change:transform;
+}
+/* brilho que segue o cursor (só ponteiro fino) */
+.cena-brilho{position:fixed;left:0;top:0;width:620px;height:620px;margin:-310px 0 0 -310px;z-index:1;
+  background:radial-gradient(circle at center, rgba(146,158,138,.16), rgba(146,158,138,0) 62%);
+  opacity:0;transition:opacity .5s ease;will-change:transform;pointer-events:none}
+body.tem-ponteiro .cena-brilho{opacity:.85}
+.cena-veu{position:absolute;inset:0;
+  background:radial-gradient(120% 90% at 50% 40%, transparent 40%, rgba(0,0,0,.55) 100%)}
+
+/* a página voa acima da cena */
+.faixa-topo,.cabecalho,.ticker,#app,.rodape{position:relative;z-index:2}
+
+/* ══════════════════ 2 · BARRA DE PROGRESSO + CABEÇALHO ══════════════════ */
+.progresso-leitura{position:fixed;top:0;left:0;right:0;height:3px;z-index:80;
+  background:linear-gradient(90deg,var(--amarelo),#d5daca);transform-origin:0 50%;
+  transform:scaleX(0);pointer-events:none}
+
+body.acabamento-imersivo:not(.modo-leitura) .faixa-topo{
+  background:rgba(8,8,11,.72);border-bottom:1px solid var(--borda);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:var(--texto-fraco);
+  transition:transform .35s ease, opacity .35s ease;
+}
+body.acabamento-imersivo.rolou:not(.modo-leitura) .faixa-topo{transform:translateY(-100%);opacity:0}
+
+body.acabamento-imersivo:not(.modo-leitura) .cabecalho{
+  position:sticky;top:0;z-index:60;color:var(--texto);background:rgba(10,10,14,.66);
+  background-image:none;border-bottom:1px solid var(--borda);
+  backdrop-filter:blur(16px) saturate(1.2);-webkit-backdrop-filter:blur(16px) saturate(1.2);
+  box-shadow:0 18px 40px -30px #000;
+  transition:padding .3s ease, background .3s ease;
+}
+body.acabamento-imersivo:not(.modo-leitura) .cabecalho-linha{padding:.75rem 0 .6rem;transition:padding .3s ease}
+body.acabamento-imersivo.rolou:not(.modo-leitura) .cabecalho-linha{padding:.42rem 0 .38rem}
+body.acabamento-imersivo:not(.modo-leitura) .cabecalho::after{
+  content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(146,158,138,.55),transparent);opacity:0;transition:opacity .4s}
+body.acabamento-imersivo.rolou:not(.modo-leitura) .cabecalho::after{opacity:1}
+
+body.acabamento-imersivo:not(.modo-leitura) .marca-grid{filter:drop-shadow(0 4px 10px rgba(146,158,138,.35))}
+body.acabamento-imersivo:not(.modo-leitura) .marca-texto strong{color:var(--texto)}
+body.acabamento-imersivo:not(.modo-leitura) .marca-texto em{color:var(--amarelo);opacity:.85;letter-spacing:.3em}
+body.acabamento-imersivo:not(.modo-leitura) .marca{transition:transform .3s}
+body.acabamento-imersivo:not(.modo-leitura) .marca:hover{transform:translateY(-1px) scale(1.02)}
+
+body.acabamento-imersivo:not(.modo-leitura) .busca{
+  border:1px solid var(--borda-forte);background:rgba(255,255,255,.05);border-radius:999px;
+  overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,.06);transition:border-color .2s, box-shadow .2s;
+}
+body.acabamento-imersivo:not(.modo-leitura) .busca:focus-within{border-color:rgba(146,158,138,.6);box-shadow:0 0 0 4px rgba(146,158,138,.12)}
+body.acabamento-imersivo:not(.modo-leitura) .busca input{color:var(--texto)}
+body.acabamento-imersivo:not(.modo-leitura) .busca input::placeholder{color:rgba(240,237,230,.42)}
+body.acabamento-imersivo:not(.modo-leitura) .busca button{background:var(--amarelo);color:#0a0a0a;border-radius:999px;margin:4px;padding:0 1rem}
+body.acabamento-imersivo:not(.modo-leitura) .busca button:hover{background:#fff;color:#0a0a0a}
+
+/* navegação: pastilhas com luz */
+body.acabamento-imersivo:not(.modo-leitura) .nav-secoes{
+  background:transparent;border-top:1px solid var(--borda);border-bottom:0;
+}
+body.acabamento-imersivo:not(.modo-leitura) .nav-secoes a{
+  color:rgba(240,237,230,.72);border-right:0;border-radius:999px;margin:.3rem .12rem;padding:.42rem .82rem;
+  border:1px solid transparent;transition:color .2s, background .2s, border-color .2s, transform .2s;
+}
+body.acabamento-imersivo:not(.modo-leitura) .nav-secoes a:hover{background:rgba(255,255,255,.08);color:#fff;border-color:var(--borda);transform:translateY(-1px)}
+body.acabamento-imersivo:not(.modo-leitura) .nav-secoes a.ativo{background:linear-gradient(180deg,rgba(146,158,138,.22),rgba(146,158,138,.10));color:var(--amarelo);border-color:rgba(146,158,138,.45)}
+body.acabamento-imersivo:not(.modo-leitura) .nav-secoes a.ativo::after{display:none}
+
+/* ticker: faixa de vidro com varredura de luz */
+body.acabamento-imersivo:not(.modo-leitura) .ticker{
+  background:linear-gradient(90deg,rgba(146,158,138,.14),rgba(146,158,138,.03) 42%,rgba(255,255,255,.03));
+  background-image:linear-gradient(90deg,rgba(146,158,138,.14),rgba(146,158,138,.03) 42%,rgba(255,255,255,.03));
+  color:var(--texto);border-bottom:1px solid var(--borda);position:relative;overflow:hidden;
+}
+body.acabamento-imersivo:not(.modo-leitura) .ticker::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(100deg,transparent 20%,rgba(255,255,255,.10) 48%,transparent 76%);
+  transform:translateX(-100%);animation:varredura 7s ease-in-out infinite;
+}
+body.acabamento-imersivo:not(.modo-leitura) .ticker-etiqueta{background:var(--amarelo);color:#0a0a0a;border-radius:0 999px 999px 0}
+body.acabamento-imersivo:not(.modo-leitura) .ticker-trilho a,body.acabamento-imersivo:not(.modo-leitura) .ticker-trilho span{color:rgba(242,239,230,.86)}
+
+/* ══════════════════ 3 · TIPOGRAFIA E TÍTULOS ══════════════════ */
+body.acabamento-imersivo:not(.modo-leitura) .titulo-secao{
+  border-bottom:1px solid var(--borda);color:var(--texto);padding-bottom:.6rem;
+}
+body.acabamento-imersivo:not(.modo-leitura) .titulo-secao h2{
+  font-family:var(--sans);font-weight:800;letter-spacing:-.03em;
+  background:linear-gradient(92deg,#fff 0%, #cdd3c4 46%, var(--amarelo) 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  text-shadow:0 12px 34px rgba(146,158,138,.18);
+}
+body.acabamento-imersivo:not(.modo-leitura) .kicker{color:var(--amarelo)}
+body.acabamento-imersivo:not(.modo-leitura) .sub{color:var(--texto-fraco)}
+
+/* ══════════════════ 4 · CARTÕES EM 3D (recortes) ══════════════════ */
+body.acabamento-imersivo:not(.modo-leitura) .mosaico{perspective:1400px;perspective-origin:50% 30%}
+
+body.acabamento-imersivo:not(.modo-leitura) .recorte{
+  background:linear-gradient(165deg, rgba(255,255,255,.075), rgba(255,255,255,.022) 46%, rgba(255,255,255,.045));
+  background-image:linear-gradient(165deg, rgba(255,255,255,.075), rgba(255,255,255,.022) 46%, rgba(255,255,255,.045));
+  color:var(--texto);border:1px solid var(--borda);border-radius:var(--raio);
+  box-shadow:var(--profundidade);padding:.95rem 1rem 1.05rem;
+  /* Profundidade se dá por luz, sombra e borda; o transform 3D só entra quando o
+     ponteiro está sobre o cartão (.em-3d). Assim nada fica composto em 3D o tempo
+     todo — as fotos pintam de forma confiável até em rasterização por software. */
+  transition:transform .45s cubic-bezier(.22,.61,.36,1), box-shadow .35s ease, border-color .3s ease, opacity .5s ease;
+}
+body.acabamento-imersivo:not(.modo-leitura) .recorte.em-3d{
+  transform:perspective(1100px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translate3d(0,0,0);
+}
+/* sem ponteiro: só um realce de borda no hover */
+@media (hover:hover){
+  body.acabamento-imersivo:not(.modo-leitura) .recorte:hover{border-color:rgba(146,158,138,.42);
+    box-shadow:var(--profundidade-alta), 0 0 0 1px rgba(146,158,138,.18), 0 0 60px -22px rgba(146,158,138,.55);}
+}
+body.acabamento-imersivo:not(.modo-leitura) .recorte::before{
+  background-image:var(--meiotom);background-size:4px 4px;opacity:.06;border-radius:var(--raio);
+}
+/* luz que acompanha o cursor dentro do cartão */
+body.acabamento-imersivo:not(.modo-leitura) .recorte::after{
+  content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;
+  background:radial-gradient(360px circle at var(--mx,50%) var(--my,0%), rgba(146,158,138,.16), transparent 62%);
+  transition:opacity .35s ease;
+}
+body.tem-ponteiro .recorte.em-3d::after{opacity:1}
+body.acabamento-imersivo:not(.modo-leitura) .recorte.em-3d{transition:transform .1s linear, box-shadow .35s ease, border-color .3s ease}
+
+
+body.acabamento-imersivo:not(.modo-leitura) .recorte-cabeca{border-bottom:1px solid var(--borda);color:var(--texto-fraco)}
+body.acabamento-imersivo:not(.modo-leitura) .recorte h3 a{transition:color .2s}
+body.acabamento-imersivo:not(.modo-leitura) .recorte h3 a:hover{background:linear-gradient(transparent 62%, rgba(146,158,138,.5) 0);color:#fff}
+body.acabamento-imersivo:not(.modo-leitura) .recorte-resumo{color:var(--texto-fraco)}
+body.acabamento-imersivo:not(.modo-leitura) .recorte-tempo{color:rgba(240,237,230,.5)}
+body.acabamento-imersivo:not(.modo-leitura) .recorte-rodape{border-top:1px solid var(--borda)}
+body.acabamento-imersivo:not(.modo-leitura) .recorte-secao{
+  background:rgba(255,255,255,.07);border-color:var(--borda-forte);color:rgba(240,237,230,.86);border-radius:999px;
+}
+body.acabamento-imersivo:not(.modo-leitura) .recorte-secao.grifada{background:var(--amarelo);color:#0a0a0a;border-color:var(--amarelo)}
+body.acabamento-imersivo:not(.modo-leitura) .selos span{border-radius:999px}
+
+/* ── manchete principal: palco com camadas de profundidade ── */
+body.acabamento-imersivo:not(.modo-leitura) .manchete-principal{
+  background:linear-gradient(170deg, rgba(255,255,255,.09), rgba(255,255,255,.028) 55%, rgba(146,158,138,.05));
+  background-image:linear-gradient(170deg, rgba(255,255,255,.09), rgba(255,255,255,.028) 55%, rgba(146,158,138,.05));
+  color:var(--texto);border:1px solid var(--borda);border-radius:var(--raio-g);
+  box-shadow:var(--profundidade-alta);padding:1.2rem 1.2rem 1.35rem;
+  transition:transform .5s cubic-bezier(.22,.61,.36,1), box-shadow .4s ease, border-color .3s;
+}
+body.acabamento-imersivo:not(.modo-leitura) .manchete-principal.em-3d{
+  transform:perspective(1400px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translate3d(0,0,0);
+}
+body.acabamento-imersivo:not(.modo-leitura) .manchete-principal::after{
+  content:"";position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;opacity:0;
+  background:radial-gradient(520px circle at var(--mx,50%) var(--my,0%), rgba(146,158,138,.20), transparent 60%);
+  transition:opacity .4s ease;
+}
+body.tem-ponteiro .manchete-principal.em-3d::after{opacity:1}
+
+body.acabamento-imersivo:not(.modo-leitura) .manchete-principal .chapa{margin-bottom:1rem}
+body.acabamento-imersivo:not(.modo-leitura) .manchete-principal .faixa-urgente{border-radius:999px;
+  background:linear-gradient(90deg,var(--amarelo),#c3cab9);color:#0a0a0a;box-shadow:0 14px 30px -18px rgba(146,158,138,.9)}
+body.acabamento-imersivo:not(.modo-leitura) .manchete-principal .recorte-cabeca{border-bottom-color:var(--borda);color:var(--texto-fraco)}
+body.acabamento-imersivo:not(.modo-leitura) .manchete-principal h1{font-family:var(--sans);font-weight:800;
+  letter-spacing:-.035em;line-height:1.03;text-wrap:balance}
+body.acabamento-imersivo:not(.modo-leitura) .manchete-principal h1 a:hover{background:linear-gradient(transparent 62%, rgba(146,158,138,.5) 0)}
+body.acabamento-imersivo:not(.modo-leitura) .manchete-principal .olho{color:var(--texto-fraco)}
+
+
+/* ── coluna urgente e placas dos veículos ── */
+body.acabamento-imersivo:not(.modo-leitura) .coluna-urgente{
+  background:linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.025));
+  background-image:linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.025));
+  color:var(--texto);border:1px solid var(--borda);border-radius:var(--raio);box-shadow:var(--profundidade);
+  transition:transform .5s cubic-bezier(.22,.61,.36,1), box-shadow .35s;
+}
+body.acabamento-imersivo:not(.modo-leitura) .coluna-urgente.em-3d{
+  transform:perspective(1100px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));
+}
+body.acabamento-imersivo:not(.modo-leitura) .coluna-urgente header{border-bottom:1px solid var(--borda)}
+body.acabamento-imersivo:not(.modo-leitura) .coluna-urgente header h3{font-family:var(--sans);font-weight:800;letter-spacing:-.02em}
+body.acabamento-imersivo:not(.modo-leitura) .urgente-lista li{border-bottom:1px solid var(--borda);color:var(--texto)}
+body.acabamento-imersivo:not(.modo-leitura) .urgente-lista .veic{color:var(--texto-fraco)}
+body.acabamento-imersivo:not(.modo-leitura) .urgente-lista a:hover{background:linear-gradient(transparent 60%, rgba(146,158,138,.42) 0)}
+body.acabamento-imersivo:not(.modo-leitura) .urgente-lista .num{color:var(--amarelo)}
+
+body.acabamento-imersivo:not(.modo-leitura) .faixa-veiculos{border-top:1px solid var(--borda);border-bottom:1px solid var(--borda)}
+body.acabamento-imersivo:not(.modo-leitura) .desliza-veiculos{perspective:1200px}
+body.acabamento-imersivo:not(.modo-leitura) .placa-veiculo{
+  background:linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.02));
+  color:var(--texto);border:1px solid var(--borda);border-radius:var(--raio);box-shadow:var(--profundidade);
+  transition:transform .45s cubic-bezier(.22,.61,.36,1), border-color .3s, box-shadow .3s;
+}
+body.acabamento-imersivo:not(.modo-leitura) .placa-veiculo.em-3d{
+  transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));
+}
+body.acabamento-imersivo:not(.modo-leitura) .placa-veiculo:hover{background:linear-gradient(180deg, rgba(146,158,138,.16), rgba(255,255,255,.03));border-color:rgba(146,158,138,.4);transform:perspective(900px) translateY(-6px) scale(1.02)}
+body.acabamento-imersivo:not(.modo-leitura) .placa-veiculo .pv-nome{border-bottom-color:var(--borda-forte);color:#fff}
+body.acabamento-imersivo:not(.modo-leitura) .placa-veiculo .pv-topo,body.acabamento-imersivo:not(.modo-leitura) .placa-veiculo .pv-pe{color:var(--texto-fraco)}
+body.acabamento-imersivo:not(.modo-leitura) .placa-veiculo .pv-titulo{color:var(--texto-fraco)}
+
+/* ══════════════════ 5 · IMAGENS (chapas) ══════════════════ */
+body.acabamento-imersivo:not(.modo-leitura) .chapa{
+  border:0;outline:0;border-radius:12px;background:#0d0d12;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.09), 0 22px 40px -26px rgba(0,0,0,.95);
+  transition:box-shadow .35s ease, transform .45s cubic-bezier(.22,.61,.36,1);
+}
+body.acabamento-imersivo:not(.modo-leitura) .chapa img{
+  /* sem filtro: a foto fica colorida de verdade e economiza uma passada de GPU */
+  filter:none;mix-blend-mode:normal;
+  transition:transform .6s cubic-bezier(.22,.61,.36,1);
+}
+body.acabamento-imersivo:not(.modo-leitura) .chapa::after{opacity:.09}
+body.acabamento-imersivo:not(.modo-leitura) .chapa::before{background:linear-gradient(180deg, rgba(0,0,0,.35), transparent 40%, rgba(0,0,0,.45))}
+body.acabamento-imersivo:not(.modo-leitura) .recorte:hover .chapa img,
+body.acabamento-imersivo:not(.modo-leitura) .manchete-principal:hover .chapa img{transform:scale(1.045)}
+body.acabamento-imersivo:not(.modo-leitura) .recorte:hover .chapa{box-shadow:inset 0 0 0 1px rgba(146,158,138,.28), 0 30px 54px -28px rgba(0,0,0,1)}
+body.acabamento-imersivo:not(.modo-leitura) .chapa figcaption{background:linear-gradient(0deg, rgba(6,6,9,.92), rgba(6,6,9,0));font-style:normal}
+body.acabamento-imersivo:not(.modo-leitura) .chapa-pequena{border-radius:10px}
+body.acabamento-imersivo:not(.modo-leitura) .faixa-chapa{border-radius:999px;padding:.2rem .6rem}
+
+/* ══════════════════ 6 · CONTROLES, ABAS E CAIXAS ══════════════════ */
+body.acabamento-imersivo:not(.modo-leitura) .btn{
+  border:1px solid var(--borda-forte);border-radius:999px;position:relative;overflow:hidden;
+  transition:transform .2s cubic-bezier(.22,.61,.36,1), background .25s, color .25s, border-color .25s, box-shadow .25s;
+  transform:translate3d(var(--bx,0), var(--by,0), 0);
+}
+body.acabamento-imersivo:not(.modo-leitura) .btn:hover{transform:translate3d(var(--bx,0), calc(var(--by,0px) - 2px), 0)}
+body.acabamento-imersivo:not(.modo-leitura) .btn-amarelo{background:linear-gradient(180deg,#b8bfb0,var(--amarelo));color:#0a0a0a;border-color:transparent;
+  box-shadow:0 14px 30px -16px rgba(146,158,138,.75)}
+body.acabamento-imersivo:not(.modo-leitura) .btn-amarelo:hover{background:linear-gradient(180deg,#fff,#cdd3c4);color:#0a0a0a}
+body.acabamento-imersivo:not(.modo-leitura) .btn-tinta{background:rgba(255,255,255,.09);color:#fff;border-color:var(--borda-forte)}
+body.acabamento-imersivo:not(.modo-leitura) .btn-tinta:hover{background:var(--amarelo);color:#0a0a0a}
+body.acabamento-imersivo:not(.modo-leitura) .btn-vazio:hover,body.acabamento-imersivo:not(.modo-leitura) .btn-fantasma:hover{
+  background:rgba(255,255,255,.10);color:#fff;border-color:var(--borda-forte)}
+body.acabamento-imersivo:not(.modo-leitura) .btn-mini{border-radius:999px}
+/* onda de luz ao clicar */
+.onda{position:absolute;border-radius:50%;transform:translate(-50%,-50%) scale(0);pointer-events:none;
+  background:radial-gradient(circle, rgba(255,255,255,.55), rgba(255,255,255,0) 70%);
+  width:180px;height:180px;animation:onda .55s ease-out forwards}
+@keyframes onda{to{transform:translate(-50%,-50%) scale(1.6);opacity:0}}
+
+body.acabamento-imersivo:not(.modo-leitura) .chip,body.acabamento-imersivo:not(.modo-leitura) .chip-tema,body.acabamento-imersivo:not(.modo-leitura) .chip-vigiar{
+  border-radius:999px;border-color:var(--borda-forte);color:var(--texto-fraco);background:rgba(255,255,255,.04);
+  transition:transform .2s, background .2s, color .2s, border-color .2s}
+body.acabamento-imersivo:not(.modo-leitura) .chip:hover,body.acabamento-imersivo:not(.modo-leitura) .chip-tema:hover,body.acabamento-imersivo:not(.modo-leitura) .chip-vigiar:hover{
+  color:var(--amarelo);border-color:rgba(146,158,138,.5);background:rgba(146,158,138,.08);transform:translateY(-1px)}
+body.acabamento-imersivo:not(.modo-leitura) .chip.ativo,body.acabamento-imersivo:not(.modo-leitura) .chip-vigiar.ativo,body.acabamento-imersivo:not(.modo-leitura) .chip-tema.ativo{
+  background:linear-gradient(180deg,#b8bfb0,var(--amarelo));color:#0a0a0a;border-color:transparent}
+
+body.acabamento-imersivo:not(.modo-leitura) .barra-edicao{
+  background:linear-gradient(90deg, rgba(255,255,255,.07), rgba(255,255,255,.02));
+  border:1px solid var(--borda);border-radius:999px;padding:.42rem .6rem;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06);position:relative;z-index:3}
+body.acabamento-imersivo:not(.modo-leitura) .filtros,body.acabamento-imersivo:not(.modo-leitura) .barra-fontes{
+  border:1px solid var(--borda);border-radius:var(--raio);background:rgba(255,255,255,.045);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+body.acabamento-imersivo:not(.modo-leitura) .filtros select,body.acabamento-imersivo:not(.modo-leitura) .filtros input,
+body.acabamento-imersivo:not(.modo-leitura) .barra-fontes input,body.acabamento-imersivo:not(.modo-leitura) .barra-fontes select{
+  background:rgba(0,0,0,.35);border:1px solid var(--borda-forte);border-radius:10px;color:var(--texto)}
+body.acabamento-imersivo:not(.modo-leitura) .pergunta-bloco{
+  border:1px solid var(--borda);border-top:2px solid var(--amarelo);border-radius:var(--raio-g);
+  background:linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.02));
+  box-shadow:var(--profundidade)}
+body.acabamento-imersivo:not(.modo-leitura) .pergunta-bloco h3{font-family:var(--sans);font-weight:800;letter-spacing:-.03em;color:#fff}
+
+/* caixas, cartões das abas e do painel: vidro escuro coerente */
+body.acabamento-imersivo :is(.caixa,.cartao-categoria,.cartao-tema,.bloco-pref,.cartao-exibicao,.cartao-origem,
+  .cartao-veiculo,.cartao-plano,.opcao-fonte,.opcao-radio,.opcao-check,.cep-resultado,.caixa-aviso,.folha,
+  .cartao-perfil,.resumo-leitor .item,.caixa-obrigado,.cola-rodape,.bloco-fontes>header){
+  border-radius:var(--raio);border-color:var(--borda);
+  background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+}
+body.acabamento-imersivo :is(.cartao-categoria,.cartao-tema,.cartao-exibicao,.cartao-origem,.opcao-fonte,.opcao-radio,
+  .cartao-veiculo,.cartao-plano,.caixa,.bloco-pref,.resumo-leitor .item,.caixa-obrigado){
+  box-shadow:var(--profundidade);
+}
+body.acabamento-imersivo :is(.cartao-categoria,.cartao-tema,.cartao-origem,.cartao-exibicao,.cartao-veiculo,.cartao-plano,
+  .opcao-fonte,.opcao-radio,.caixa,.bloco-pref,.resumo-leitor .item){
+  transform:perspective(1000px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translate3d(0,var(--ty,0),0);
+  transition:transform .45s cubic-bezier(.22,.61,.36,1), border-color .3s, background .3s, box-shadow .35s;
+  transform-style:preserve-3d;
+}
+body.acabamento-imersivo :is(.cartao-categoria,.cartao-tema,.cartao-origem,.cartao-exibicao,.opcao-fonte,.opcao-radio):hover{
+  border-color:rgba(146,158,138,.45)}
+body.acabamento-imersivo:not(.modo-leitura) .cartao-categoria::after{border-top-color:var(--amarelo);opacity:1}
+body.acabamento-imersivo:not(.modo-leitura) .cartao-tema.vigiado,body.acabamento-imersivo:not(.modo-leitura) .opcao-fonte.marcada,
+body.acabamento-imersivo:not(.modo-leitura) .opcao-radio.marcada,body.acabamento-imersivo:not(.modo-leitura) .opcao-check.marcada,
+body.acabamento-imersivo:not(.modo-leitura) .cartao-origem.escolhido,body.acabamento-imersivo:not(.modo-leitura) .cartao-exibicao.escolhido,
+body.acabamento-imersivo:not(.modo-leitura) .cep-resultado.ok{
+  background:linear-gradient(180deg, rgba(146,158,138,.22), rgba(146,158,138,.07));
+  border-color:rgba(146,158,138,.55);box-shadow:0 0 0 1px rgba(146,158,138,.18), var(--profundidade)}
+body.acabamento-imersivo:not(.modo-leitura) .opcao-radio b,body.acabamento-imersivo:not(.modo-leitura) .bloco-pref h4,
+body.acabamento-imersivo:not(.modo-leitura) .cartao-categoria .cc-nome,body.acabamento-imersivo:not(.modo-leitura) .contador-fontes{color:var(--texto)}
+body.acabamento-imersivo:not(.modo-leitura) .opcao-radio small,body.acabamento-imersivo:not(.modo-leitura) .opcao-check small,
+body.acabamento-imersivo:not(.modo-leitura) .nota-pref,body.acabamento-imersivo:not(.modo-leitura) .cc-fonte{color:var(--texto-fraco)}
+body.acabamento-imersivo:not(.modo-leitura) .bp-num{border-radius:8px}
+body.acabamento-imersivo:not(.modo-leitura) .amostra{border-radius:10px;border-color:var(--borda);background:rgba(0,0,0,.35)}
+body.acabamento-imersivo:not(.modo-leitura) .amostra i{background:rgba(255,255,255,.10);border-color:var(--borda)}
+body.acabamento-imersivo:not(.modo-leitura) .amostra .a-veiculo{background:rgba(255,255,255,.5)}
+body.acabamento-imersivo:not(.modo-leitura) .amostra .a-titulo,body.acabamento-imersivo:not(.modo-leitura) .amostra .a-resumo,
+body.acabamento-imersivo:not(.modo-leitura) .amostra .a-resumo-curto{color:rgba(255,255,255,.86)}
+body.acabamento-imersivo:not(.modo-leitura) .previa-exibicao{border-radius:var(--raio);border:1px solid var(--borda);background:rgba(255,255,255,.03)}
+
+/* formulários */
+body.acabamento-imersivo input:not([type=radio]):not([type=checkbox]),body.acabamento-imersivo select,
+body.acabamento-imersivo textarea{
+  background:rgba(0,0,0,.35);border:1px solid var(--borda-forte);border-radius:10px;color:var(--texto);
+  transition:border-color .2s, box-shadow .2s}
+body.acabamento-imersivo input:focus,body.acabamento-imersivo select:focus,body.acabamento-imersivo textarea:focus{
+  outline:none;border-color:rgba(146,158,138,.6);box-shadow:0 0 0 4px rgba(146,158,138,.12)}
+body.acabamento-imersivo:not(.modo-leitura) .form-comentario textarea{background:rgba(0,0,0,.35);border-color:var(--borda-forte);color:var(--texto);border-radius:12px}
+
+/* ══════════════════ 7 · MODAIS, AVISOS, RODAPÉ ══════════════════ */
+body.acabamento-imersivo:not(.modo-leitura) .cortina{background:rgba(4,4,7,.72);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+body.acabamento-imersivo:not(.modo-leitura) .painel-modal{
+  border:1px solid var(--borda-forte);border-radius:var(--raio-g);
+  background:linear-gradient(180deg, rgba(22,22,28,.96), rgba(12,12,16,.98));
+  box-shadow:0 60px 120px -40px #000, inset 0 1px 0 rgba(255,255,255,.08);
+  color:var(--texto);
+}
+body.acabamento-imersivo:not(.modo-leitura) .painel-auth{max-width:520px}
+body.acabamento-imersivo:not(.modo-leitura) .perfil{border-radius:var(--raio);border-color:var(--borda);
+  background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));transition:transform .25s, border-color .25s}
+body.acabamento-imersivo:not(.modo-leitura) .perfil:hover{transform:translateY(-3px);border-color:rgba(146,158,138,.45)}
+body.acabamento-imersivo:not(.modo-leitura) .perfil.ativo{border-color:var(--amarelo);background:linear-gradient(180deg, rgba(146,158,138,.2), rgba(146,158,138,.06))}
+body.acabamento-imersivo:not(.modo-leitura) .toast{
+  border-radius:14px;border:1px solid var(--borda-forte);background:rgba(16,16,20,.96);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:var(--texto);
+  box-shadow:0 30px 60px -30px #000;animation:aviso-entra .45s cubic-bezier(.22,.61,.36,1) both}
+@keyframes aviso-entra{from{opacity:0;transform:translateY(14px) scale(.96)}to{opacity:1;transform:none}}
+body.acabamento-imersivo:not(.modo-leitura) .toast b{color:var(--amarelo)}
+body.acabamento-imersivo:not(.modo-leitura) .rodape{
+  background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(0,0,0,.5));
+  border-top:1px solid var(--borda);color:var(--texto-fraco)}
+body.acabamento-imersivo:not(.modo-leitura) .rodape-marca{color:#fff}
+body.acabamento-imersivo:not(.modo-leitura) .rodape h4{color:var(--amarelo)}
+body.acabamento-imersivo:not(.modo-leitura) .rodape a:hover{color:#fff}
+body.acabamento-imersivo:not(.modo-leitura) .painel-vazio{border:1px dashed var(--borda-forte);border-radius:var(--raio);color:var(--texto-fraco);background:rgba(255,255,255,.03)}
+body.acabamento-imersivo:not(.modo-leitura) .painel-vazio b{color:#fff}
+body.acabamento-imersivo:not(.modo-leitura) .carregando{color:var(--texto-fraco)}
+
+/* ══════════════════ 8 · ARTIGO: FOLHA FLUTUANDO NO 3D ══════════════════ */
+body.acabamento-imersivo:not(.modo-leitura) .paralaxe-ativa{
+  transform:translate3d(0,var(--ty,0),0);will-change:transform;
+}
+body.acabamento-imersivo:not(.modo-leitura) :is(.recorte,.manchete-principal,.coluna-urgente,.placa-veiculo).em-3d{will-change:transform}
+body.acabamento-imersivo:not(.modo-leitura) .pagina-jornal{
+  border:0;border-radius:6px;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,.5) inset,
+    0 40px 80px -40px #000,
+    0 120px 160px -80px rgba(0,0,0,.95);
+  transform-origin:50% 0%;
+  transition:transform .6s cubic-bezier(.22,.61,.36,1);
+  position:relative;
+}
+body.acabamento-imersivo:not(.modo-leitura) .pagina-jornal::before{
+  content:"";position:absolute;inset:-40px -30px auto;height:60px;border-radius:50%;
+  background:radial-gradient(60% 100% at 50% 100%, rgba(146,158,138,.22), transparent 70%);
+  filter:blur(6px);pointer-events:none;
+}
+/* Folha clara, tinta preta: o tema imersivo é escuro, mas a página do jornal
+   é papel claro. Sem isto, as cores brancas do tema (--texto / #fff) vazam
+   para dentro da folha — temas, comentários, botões e os recortes de
+   "relacionados" — e o texto branco some sobre o papel. Aqui, tudo o que
+   está sobre o papel volta a ser preto. Só mantêm texto claro os trechos
+   que têm o próprio fundo preto (faixa de destaque e legenda da foto). */
+body.acabamento-imersivo:not(.modo-leitura) .pagina-jornal{color:#000}
+body.acabamento-imersivo:not(.modo-leitura) .pagina-jornal :is(
+  h1,h2,h3,h4,a,b,strong,time,.masthead,.manchete,.cidade,.expediente,
+  .sub-manchete,.assinatura,.corpo-jornal,.origem-linha,.link-origem,
+  .aviso-transparencia,.sub,.kicker,.mono,.pilula-contagem,
+  .comentario,.comentario-cabeca,.bloco-comentarios h3,.relacionados h3,
+  .recorte,.recorte-cabeca,.recorte-veiculo,.recorte-tempo,.recorte-resumo,
+  .recorte h3,.recorte h3 a,.painel-vazio,.painel-vazio b,.etiqueta){color:#000}
+body.acabamento-imersivo:not(.modo-leitura) .pagina-jornal :is(.chip,.chip-tema,.chip-vigiar){
+  color:#000;border-color:#000;background:transparent}
+body.acabamento-imersivo:not(.modo-leitura) .pagina-jornal :is(.chip,.chip-tema,.chip-vigiar):hover{
+  color:#000;border-color:#000;background:var(--amarelo)}
+body.acabamento-imersivo:not(.modo-leitura) .pagina-jornal :is(.chip,.chip-tema,.chip-vigiar).ativo{
+  color:#000;border-color:#000;background:var(--amarelo)}
+body.acabamento-imersivo:not(.modo-leitura) .pagina-jornal .btn{
+  color:#000;border-color:#000;background:transparent}
+body.acabamento-imersivo:not(.modo-leitura) .pagina-jornal .btn:hover{
+  color:#000;border-color:#000;background:var(--amarelo)}
+body.acabamento-imersivo:not(.modo-leitura) .pagina-jornal .btn-tinta{
+  color:#000;border-color:#000;background:var(--papel-2)}
+body.acabamento-imersivo:not(.modo-leitura) .pagina-jornal .btn-tinta:hover{
+  color:#000;border-color:#000;background:var(--amarelo)}
+body.acabamento-imersivo:not(.modo-leitura) .pagina-jornal .btn-amarelo{
+  color:#000;border-color:#000;background:var(--amarelo)}
+body.acabamento-imersivo:not(.modo-leitura) .pagina-jornal .recorte{
+  background:var(--papel);background-image:var(--grao);color:#000;
+  border:1px solid #000}
+body.acabamento-imersivo:not(.modo-leitura) .pagina-jornal .recorte-cabeca{
+  border-bottom:3px double #000;color:#000}
+body.acabamento-imersivo:not(.modo-leitura) .pagina-jornal .recorte-rodape{border-top-color:#b9b3a1}
+body.acabamento-imersivo:not(.modo-leitura) .pagina-jornal .recorte-secao{
+  background:#fff;color:#000;border-color:#000}
+body.acabamento-imersivo:not(.modo-leitura) .pagina-jornal .recorte-secao.grifada{
+  background:var(--amarelo);color:#000;border-color:#000}
+body.acabamento-imersivo:not(.modo-leitura) .pagina-jornal :is(.selo-lida,.selo-regiao,.recorte .chip-tema){
+  color:#000;border-color:#000}
+body.acabamento-imersivo:not(.modo-leitura) .pagina-jornal :is(input,select,textarea),
+body.acabamento-imersivo:not(.modo-leitura) .pagina-jornal .form-comentario textarea{
+  background:#fff;color:#000;border-color:#000;border-radius:0}
+body.acabamento-imersivo:not(.modo-leitura) .pagina-jornal textarea::placeholder{color:#555}
+body.acabamento-imersivo:not(.modo-leitura) .pagina-jornal .faixa-urgente{
+  background:var(--tinta);color:var(--amarelo)}
+body.acabamento-imersivo:not(.modo-leitura) .pagina-jornal .chapa figcaption{
+  background:rgba(10,10,10,.82);color:var(--papel-2)}
+body.acabamento-imersivo:not(.modo-leitura) .abas,body.acabamento-imersivo:not(.modo-leitura) .abas button{border-radius:999px}
+body.acabamento-imersivo:not(.modo-leitura) .abas{display:flex;gap:.4rem;flex-wrap:wrap;border:0;background:transparent}
+body.acabamento-imersivo:not(.modo-leitura) .abas button{
+  border:1px solid var(--borda);background:rgba(255,255,255,.05);color:var(--texto-fraco);padding:.45rem .95rem}
+body.acabamento-imersivo:not(.modo-leitura) .abas button.ativo{background:linear-gradient(180deg,#b8bfb0,var(--amarelo));color:#0a0a0a;border-color:transparent}
+body.acabamento-imersivo:not(.modo-leitura) .cartao-perfil{border-radius:var(--raio-g);box-shadow:var(--profundidade)}
+
+/* ══════════════════ 9 · PAINEL DA REDAÇÃO ══════════════════ */
+body.acabamento-imersivo:not(.modo-leitura) .admin-cabecalho,body.acabamento-imersivo:not(.modo-leitura) .abas-admin{
+  border:1px solid var(--borda);border-radius:var(--raio);background:rgba(255,255,255,.05)}
+body.acabamento-imersivo:not(.modo-leitura) .abas-admin button{border-radius:999px}
+body.acabamento-imersivo:not(.modo-leitura) .abas-admin button.ativo{background:linear-gradient(180deg,#b8bfb0,var(--amarelo));color:#0a0a0a}
+body.acabamento-imersivo:not(.modo-leitura) .tabela th{color:var(--amarelo);border-bottom-color:var(--borda-forte)}
+body.acabamento-imersivo:not(.modo-leitura) .tabela td,body.acabamento-imersivo:not(.modo-leitura) .tabela tr{border-color:var(--borda)}
+body.acabamento-imersivo:not(.modo-leitura) .etiqueta{border-radius:999px}
+body.acabamento-imersivo:not(.modo-leitura) .barras .barra i{background:linear-gradient(180deg,#b8bfb0,var(--amarelo))}
+body.acabamento-imersivo:not(.modo-leitura) .miniatura img{border-radius:8px}
+
+/* ══════════════════ 10 · ANIMAÇÕES DE ENTRADA E TROCA DE ROTA ══════════════════ */
+.vai-entrar{opacity:0;transform:translate3d(0,26px,0) rotateX(7deg) scale(.985)}
+.entrou{opacity:1;transform:none;transition:opacity .7s cubic-bezier(.22,.61,.36,1), transform .7s cubic-bezier(.22,.61,.36,1);
+  transition-delay:calc(var(--i,0) * 55ms)}
+#app{transition:opacity .22s ease, transform .22s ease}
+#app.troca-saindo{opacity:0;transform:translate3d(0,10px,0) scale(.995)}
+#app.troca-entrando{animation:rota-entra .42s ease both}
+@keyframes rota-entra{from{opacity:0}to{opacity:1}}
+body.acabamento-imersivo:not(.modo-leitura) .titulo-secao{animation:sobe .6s cubic-bezier(.22,.61,.36,1) both}
+@keyframes sobe{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes varredura{0%{transform:translateX(-100%)}55%,100%{transform:translateX(120%)}}
+@keyframes flutua{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(0,-14px,0)}}
+body.acabamento-imersivo:not(.modo-leitura) .manchete-principal{animation:flutua 9s ease-in-out infinite}
+body.acabamento-imersivo:not(.modo-leitura) .cena-aurora.a1{animation:deriva1 26s ease-in-out infinite}
+body.acabamento-imersivo:not(.modo-leitura) .cena-aurora.a2{animation:deriva2 32s ease-in-out infinite}
+body.acabamento-imersivo:not(.modo-leitura) .cena-aurora.a3{animation:deriva3 38s ease-in-out infinite}
+@keyframes deriva1{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(6vw,4vh,0) scale(1.08)}}
+@keyframes deriva2{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(-5vw,6vh,0) scale(1.12)}}
+@keyframes deriva3{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(-3vw,-4vh,0) scale(1.06)}}
+
+/* transição nativa de páginas (Chrome/Edge) */
+@view-transition{navigation:auto}
+::view-transition-old(root){animation:vt-sai .26s ease both}
+::view-transition-new(root){animation:vt-entra .38s cubic-bezier(.22,.61,.36,1) both}
+@keyframes vt-sai{to{opacity:0}}
+@keyframes vt-entra{from{opacity:0}}
+
+/* botão de acabamento no cabeçalho */
+.acabamento-btn{display:inline-flex;align-items:center;gap:.35rem}
+
+/* ══════════════════ 11 · DESEMPENHO: MODO LEVE E PREFERÊNCIAS DO SISTEMA ══════════════════ */
+/* ativado em telas pequenas, aparelhos fracos, toque ou queda de FPS */
+body.efeitos-leves .recorte,body.efeitos-leves .manchete-principal,body.efeitos-leves .coluna-urgente,
+body.efeitos-leves .cartao-origem,body.efeitos-leves .cartao-exibicao,body.efeitos-leves .bloco-pref,
+body.efeitos-leves .placa-veiculo,body.efeitos-leves .caixa,body.efeitos-leves .cartao-categoria,
+body.efeitos-leves .cartao-tema,body.efeitos-leves .pagina-jornal{transform:none !important}
+body.efeitos-leves .cena-aurora{animation:none;opacity:.34}
+body.efeitos-leves .manchete-principal{animation:none}
+body.efeitos-leves .cena-grade{display:none}
+body.efeitos-leves .cena-brilho{display:none}
+body.efeitos-leves .recorte::after,body.efeitos-leves .manchete-principal::after{display:none}
+body.efeitos-leves .btn{transform:none !important}
+body.efeitos-leves .vai-entrar{transform:none;opacity:1}
+body.efeitos-leves .entrou{transition:none}
+
+@media (max-width:900px){
+  body.acabamento-imersivo:not(.modo-leitura) .cena-grade{height:34vh;opacity:.7}
+  body.acabamento-imersivo:not(.modo-leitura) .cena-aurora{opacity:.36}
+  body.acabamento-imersivo:not(.modo-leitura) .manchete-principal{animation:none}
+  body.acabamento-imersivo:not(.modo-leitura) .manchete-principal .chapa{transform:none}
+  body.acabamento-imersivo:not(.modo-leitura) .mosaico,body.acabamento-imersivo:not(.modo-leitura) .desliza-veiculos{perspective:none}
+  body.acabamento-imersivo:not(.modo-leitura) .cabecalho-linha{gap:.7rem}
+  body.acabamento-imersivo:not(.modo-leitura) .pagina-jornal{transform:none}
+}
+@media (max-width:700px){
+  body.acabamento-imersivo:not(.modo-leitura) .barra-edicao{border-radius:var(--raio)}
+  body.acabamento-imersivo:not(.modo-leitura) .titulo-secao h2{font-size:clamp(1.4rem,7vw,2rem)}
+}
+
+@media (prefers-reduced-motion: reduce){
+  body .cena-aurora,body .cena-grade,body .manchete-principal,body .ticker::after{animation:none !important}
+  body .vai-entrar{opacity:1;transform:none}
+  body .entrou{transition:none}
+  body #app{transition:none}
+  html{scroll-behavior:auto}
+  *{animation-duration:.001s !important;transition-duration:.001s !important}
+}
+
+/* ══════════════════ 12 · MODO LEITURA NO ACABAMENTO IMERSIVO ══════════════════
+   Leitura = folha clara de verdade: o imersivo recua e o texto assume. */
+body.acabamento-imersivo.modo-leitura .cena{background:#f6f4ee}
+body.acabamento-imersivo.modo-leitura .cena-aurora,body.acabamento-imersivo.modo-leitura .cena-grade,
+body.acabamento-imersivo.modo-leitura .cena-veu{display:none}
+body.acabamento-imersivo.modo-leitura .recorte:hover{transform:none}
+body.acabamento-imersivo.modo-leitura .cena-brilho{display:none}
+body.acabamento-imersivo.modo-leitura .progresso-leitura{background:linear-gradient(90deg,#737e67,var(--amarelo))}
+
+
+/* ══════════════════ 13 · CELULAR: nada de estouro de largura ══════════════════ */
+@media (max-width:900px){
+  /* trava de largura: vale nos dois acabamentos (o botão de acabamento é novo) */
+  #btnAcabamento{display:none}
+  .cabecalho-acoes{gap:.35rem;flex-wrap:wrap;justify-content:flex-end}
+  .cabecalho-acoes .btn{padding:.38rem .58rem;font-size:.68rem;letter-spacing:.05em}
+  #areaUsuario .btn[disabled]{max-width:118px;overflow:hidden;text-overflow:ellipsis}
+  .barra-edicao{gap:.3rem;flex-wrap:wrap}
+  .barra-edicao .chip{font-size:.62rem;padding:.24rem .5rem}
+  .barra-edicao .kicker{font-size:.62rem;letter-spacing:.16em}
+  .titulo-secao{gap:.6rem;flex-wrap:wrap}
+  body.acabamento-imersivo .barra-edicao{border-radius:var(--raio)}
+  body.acabamento-imersivo .barra-edicao .chip{font-size:.62rem;padding:.24rem .5rem;letter-spacing:.06em}
+  body.acabamento-imersivo .barra-edicao .kicker{font-size:.62rem;letter-spacing:.16em}
+  body.acabamento-imersivo .titulo-secao{gap:.6rem;flex-wrap:wrap}
+  body.acabamento-imersivo .nav-secoes a{padding:.38rem .68rem;font-size:.74rem}
+}
+@media (max-width:520px){
+  body.acabamento-imersivo .controle-exibicao{display:none}
+}
+
+/* no celular a barra da edição vira uma fita deslizável de uma linha só */
+@media (max-width:700px){
+  .barra-edicao{flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;gap:.45rem;
+    -webkit-overflow-scrolling:touch;scrollbar-width:none;align-items:center}
+  .barra-edicao::-webkit-scrollbar{display:none}
+  .barra-edicao .kicker{flex:none}
+  .barra-edicao .chips{flex-wrap:nowrap;overflow:visible;flex:0 1 auto}
+  .barra-edicao .chip{flex:none;white-space:nowrap}
+  .barra-edicao>.btn{flex:none;position:sticky;right:0;margin-left:.4rem;
+    box-shadow:-18px 0 22px 6px rgba(10,10,14,.92)}
+  body.acabamento-papel .barra-edicao>.btn{box-shadow:-18px 0 22px 6px var(--papel-2)}
+  .coluna-urgente{margin-top:1rem}
+}
+
+/* rótulo curto do botão de vagas no celular */
+.rotulo-curto{display:none}
+@media (max-width:760px){
+  .rotulo-longo{display:none}
+  .rotulo-curto{display:inline}
+}
+
+/* ══════════════════ 14 · TRAVA FINA DE LARGURA (celulares estreitos) ══════════════════ */
+input,select,textarea{max-width:100%}
+.cep-bloco .campo>div,.cep-bloco .campo div{flex-wrap:wrap}
+@media (max-width:560px){
+  /* Destaque e Compacto caem para uma coluna: o mínimo de 360px não cabe em 360 */
+  body.ex-destaque .mosaico{grid-template-columns:1fr}
+  body.ex-compacto .mosaico{grid-template-columns:1fr}
+  .grade-categorias,.grade-temas,.grade-temas.compacta,.grade-fontes,.grade-origens{grid-template-columns:1fr}
+  .cartao-categoria{min-height:auto}
+  .cartao-exibicao{padding-bottom:1.9rem}
+  .mosaico.larga,.relacionados .mosaico{grid-template-columns:1fr}
+}
+@media (max-width:820px){
+  .rotulo-longo{display:none}
+  .rotulo-curto{display:inline}
+}
+
+/* ══════════════════ 15 · ONDE A LARGURA MÍNIMA ESTOURAVA ══════════════════
+   1) cabeça do recorte: nome do veículo e tempo eram nowrap e empurravam o grid;
+   2) rodapé fixo das abas (cola-rodape): o bloco de texto não podia encolher. */
+.mosaico>*{min-width:0}
+.recorte-cabeca{flex-wrap:wrap;row-gap:.2rem}
+.recorte-cabeca>*{min-width:0}
+.recorte-veiculo{flex:1 1 auto;min-width:0}
+.recorte-veiculo b{min-width:0}
+.recorte-tempo{margin-left:auto;min-width:0}
+.temas-linha{flex-wrap:wrap}
+.cola-rodape>div{min-width:0}
+.cola-rodape b,.cola-rodape span{overflow-wrap:anywhere}
+.caixa-aviso,.sub,.cc-exemplo,.nota-pref,.perfil-quota,.caixa-obrigado span{overflow-wrap:anywhere}
+@media (max-width:600px){
+  .recorte-tempo{margin-left:0;flex-basis:100%}
+  .recorte{overflow-wrap:anywhere}
+}
+
+/* ══════════════════ 16 · COLUNAS DE GRID QUE NÃO ENCOLHIAM (≤400 px) ═══════ */
+.cabecalho .container,.grade-admin,.grade-preferencias,.grade-categorias,.grade-fontes{grid-template-columns:minmax(0,1fr)}
+.grade-admin>*,.grade-preferencias>*,.marca,.bloco-pref{min-width:0}
+.marca b,.marca span{overflow-wrap:anywhere}
+.caixa-aviso code,.caixa-aviso pre,.caixa-aviso kbd,.caixa-aviso a,.bloco-pref code,.bloco-pref kbd{white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word}
+.bloco-pref input,.bloco-pref select,.bloco-pref textarea{max-width:100%;min-width:0}
+.bloco-pref .linha,.bloco-pref .campo,.bloco-pref .cep,.bloco-pref form{flex-wrap:wrap;min-width:0}
+@media (max-width:430px){
+  .marca{font-size:.94em;letter-spacing:.02em;gap:.35rem}
+  .marca .selo{width:22px;height:22px}
+  .cabecalho .container{gap:.35rem}
+  .bloco-pref{padding-left:.6rem;padding-right:.6rem}
+}
+
+/* ══════════════════ 17 · BOTÕES QUE NÃO CABIAM (nomes longos de veículo) ═══
+   Uma única peça de texto longa (ex.: "Ler no The Hollywood Reporter ↗") dentro
+   de um .btn com nowrap forçava a largura mínima da capa inteira e criava
+   rolagem horizontal no celular. Botão nunca precisa passar da tela. */
+.btn{max-width:100%}
+@media (max-width:560px){
+  .acoes-leitor .btn,
+  .manchete-principal .btn,
+  .noticia-acoes .btn{white-space:normal;text-align:left;line-height:1.25}
+  .acoes-leitor,.noticia-acoes{row-gap:.45rem}
+}

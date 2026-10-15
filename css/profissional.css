@@ -1,0 +1,121 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   FOCA NEWS — CAMADA PROFISSIONAL / BANCA DE VEÍCULOS
+   Carregada por último. Referência editorial: a banca de um grande jornal
+   esportivo europeu (nome de praça forte, filete duplo, situação à vista),
+   sem copiar logotipo nem identidade de nenhum veículo.
+   Regra de ouro desta camada: situação editorial nunca é maquiada —
+   "no acervo" ≠ "em integração", e contagem zero não vira número bonito.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:focus-visible{outline:3px solid var(--amarelo);outline-offset:2px;border-radius:2px}
+
+/* ── títulos de editoria: filete duplo de jornal ── */
+.titulo-secao{border-bottom:4px double currentColor;padding-bottom:.55rem}
+.titulo-secao h2{text-wrap:balance}
+.lede-catalogo{max-width:78ch;line-height:1.65;margin-bottom:1.4rem}
+
+/* ── sigla do veículo: selo tipográfico (como a vinheta da praça) ── */
+.fonte-sigla{display:inline-grid;place-items:center;min-width:2rem;height:2rem;padding:0 .3rem;
+  background:var(--tinta);color:var(--amarelo);border:1px solid var(--amarelo);
+  font-family:var(--serif);font-weight:700;font-size:.78rem;letter-spacing:.04em;flex:none}
+.opcao-fonte .fonte-sigla{min-width:1.7rem;height:1.7rem;font-size:.68rem;margin-right:.45rem;vertical-align:-.45rem}
+
+/* ── situação do veículo ── */
+.cv-status{font-family:var(--cond);text-transform:uppercase;letter-spacing:.12em;font-size:.6rem;
+  padding:.16rem .45rem;border:1px solid currentColor;white-space:nowrap}
+.cv-status.no-acervo{background:var(--amarelo);border-color:var(--amarelo);color:var(--tinta)}
+.cv-status.em-integracao{color:inherit;opacity:.85;border-style:dashed}
+
+/* ── cartões da banca (página Veículos) ── */
+.grade-veiculos{grid-template-columns:repeat(auto-fill,minmax(258px,1fr));gap:1rem}
+.cartao-veiculo{padding:1rem;display:flex;flex-direction:column;gap:.5rem;min-height:11.5rem;
+  border-top:4px solid var(--amarelo);text-decoration:none}
+.cartao-veiculo .cv-topo{display:flex;justify-content:space-between;align-items:center;gap:.6rem}
+.cartao-veiculo .cv-nome{font-size:1.02rem;line-height:1.2}
+.cartao-veiculo.f-serif .cv-nome{font-family:var(--serif);text-transform:none;letter-spacing:0;font-size:1.08rem}
+.cartao-veiculo.f-blackletter .cv-nome{font-family:var(--black);text-transform:none;letter-spacing:0;font-size:1.3rem}
+.cartao-veiculo.f-slab .cv-nome{font-family:"Roboto Slab",Rockwell,"Courier New",var(--serif);text-transform:none;letter-spacing:0}
+.cartao-veiculo .cv-rodape{margin-top:auto;border-top:1px solid #b9b3a1;padding-top:.55rem;
+  display:flex;justify-content:space-between;align-items:baseline;gap:.7rem;font-size:.78rem}
+.cartao-veiculo .cv-rodape b{font-family:var(--black);font-size:1.35rem;color:var(--amarelo);line-height:1}
+.cartao-veiculo .cv-dominio{font-family:var(--mono);font-size:.64rem;opacity:.75;overflow-wrap:anywhere;text-align:right}
+body.acabamento-papel .cartao-veiculo .cv-rodape{border-top-color:#3a3a3a}
+body.acabamento-imersivo .cartao-veiculo .cv-rodape{border-top-color:var(--borda)}
+
+/* homenagem discreta à referência: o cartão da Gazzetta veste o rosa do papel dela */
+.cartao-veiculo[href="#/fonte/la-gazzetta-dello-sport"],
+.opcao-fonte[data-id="la-gazzetta-dello-sport"]{background:#f6dcd6 !important;color:#141414 !important;border-color:#141414 !important}
+.cartao-veiculo[href="#/fonte/la-gazzetta-dello-sport"] .cv-meta,
+.cartao-veiculo[href="#/fonte/la-gazzetta-dello-sport"] .cv-rodape,
+.opcao-fonte[data-id="la-gazzetta-dello-sport"] .of-meta{color:#3d3d3d !important;border-top-color:#141414}
+.cartao-veiculo[href="#/fonte/la-gazzetta-dello-sport"] .cv-rodape b{color:#141414}
+
+/* ── Minhas fontes: situação sem ocupar o lugar da marca de escolha ── */
+.opcao-fonte .cv-status{grid-column:3;grid-row:1;justify-self:end}
+.opcao-fonte .of-marca{grid-column:3;grid-row:2;justify-self:end}
+
+/* ── barras de filtro da banca ── */
+.barra-veiculos{align-items:center}
+.barra-veiculos input[type="search"]{flex:1;min-width:210px}
+
+/* ── leitura e impressão da página do jornal ── */
+@media print{
+  .faixa-topo,.cabecalho,.ticker,.rodape,.acoes-leitor,.bloco-comentarios,.cena,.cena-brilho{display:none !important}
+  body{background:#fff !important}
+  .pagina-jornal{box-shadow:none !important;border:0 !important;max-width:100%}
+}
+
+/* ── frescor da capa ── */
+.linha-frescor{font-family:var(--mono);font-size:.74rem;color:var(--cinza-claro);margin:.4rem 0 1rem}
+body.acabamento-papel .linha-frescor,body.modo-leitura .linha-frescor{color:#4a4a4a}
+.linha-frescor b{color:var(--amarelo-fosco)}
+
+/* ── planos ── */
+.ciclo-planos{display:flex;gap:.5rem;align-items:center;margin-bottom:1.2rem;flex-wrap:wrap}
+.selo-economia{background:var(--tinta);color:var(--amarelo);padding:.05rem .35rem;font-size:.62rem;margin-left:.3rem}
+.cartao-plano .preco{font-family:var(--black);font-size:2rem;line-height:1}
+.cartao-plano .preco small{font-size:.85rem;font-family:var(--cond)}
+.preco-mes{display:block;font-family:var(--mono);font-size:.7rem;opacity:.75;margin-top:.25rem}
+.cartao-plano ul{margin:.8rem 0 1.1rem;padding-left:1.1rem;list-style:disc}
+.cartao-plano li{margin:.32rem 0;font-size:.88rem;line-height:1.45}
+.nota-planos{font-size:.8rem;opacity:.75;max-width:78ch;margin-top:1.2rem;line-height:1.55}
+.checkout-itens{margin:0 0 1rem;padding-left:1.1rem;list-style:disc}
+.checkout-itens li{margin:.3rem 0;font-size:.9rem}
+
+/* ── Área VIP (referência: cartão de membro sobre a página) ── */
+.vip-grade{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:1.4rem;align-items:start;margin-top:1.2rem}
+.vip-conteudo{display:grid;gap:1.2rem;min-width:0}
+.cartao-membro{background:#fdfcf7;color:#141414;border:1px solid #141414;border-radius:18px;
+  padding:1.4rem;box-shadow:0 34px 60px -34px #000;position:sticky;top:1rem}
+.cartao-membro h3{font-family:var(--serif);font-size:1.55rem;text-align:center;margin-bottom:1.1rem;color:#141414}
+.membro-quem{display:flex;gap:.8rem;align-items:center;margin-bottom:1rem}
+.membro-avatar{width:52px;height:52px;flex:none;border-radius:50%;background:var(--amarelo);color:#141414;
+  display:grid;place-items:center;font-family:var(--serif);font-weight:700;border:1px solid #141414}
+.membro-quem b{display:block;font-size:1rem;color:#141414}
+.membro-quem span{display:block;font-size:.76rem;color:#4a4a4a;font-family:var(--mono)}
+.cartao-membro .cv-status{color:#141414}
+.membro-renova{font-family:var(--mono);font-size:.7rem;color:#4a4a4a;margin-left:.4rem}
+.membro-acoes{display:flex;gap:.5rem;margin-top:1rem;flex-wrap:wrap}
+.vip-trava{border:2px dashed #6f6f6f;padding:1.6rem;text-align:center;display:grid;gap:.5rem;justify-items:center}
+.resumo-dia{list-style:none}
+.resumo-dia li{padding:.5rem 0;border-bottom:1px dotted #8e8878;font-size:.94rem}
+.resumo-dia .mono{color:var(--amarelo-fosco);margin-right:.4rem}
+.boletins{display:grid;gap:.45rem;margin-top:1rem;border-top:1px solid #b9b3a1;padding-top:.8rem}
+.boletins label{display:flex;gap:.5rem;align-items:center;font-size:.88rem;cursor:pointer}
+.boletins input{width:17px;height:17px;accent-color:#929e8a}
+.barras-h{display:grid;gap:.5rem}
+.barras-h>div{display:grid;grid-template-columns:130px 1fr 34px;gap:.6rem;align-items:center;font-size:.82rem}
+.barras-h i{display:block;height:9px;background:var(--amarelo);min-width:4px}
+.barras-h b{font-family:var(--mono);text-align:right}
+.enquete{display:flex;gap:.5rem;flex-wrap:wrap}
+.nota-voto{margin-top:.6rem;opacity:.75}
+.selo-apoiador{background:var(--tinta);color:var(--amarelo);padding:.28rem .6rem;font-family:var(--cond);letter-spacing:.12em;text-transform:uppercase;font-size:.72rem}
+.destaque-premium{border-top:4px solid var(--amarelo)}
+
+@media (max-width:900px){.vip-grade{grid-template-columns:1fr}.cartao-membro{position:static}}
+@media (max-width:560px){
+  .grade-veiculos{grid-template-columns:1fr}
+  .cartao-veiculo{min-height:0}
+  .cartao-veiculo .cv-rodape{flex-wrap:wrap}
+  .barras-h>div{grid-template-columns:96px 1fr 30px}
+}
