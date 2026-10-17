@@ -1,6 +1,6 @@
 # Foca News
 
-Portal de notícias com **339 veículos** do Brasil e do mundo, atualização diária automática de manchetes, planos pagos (Plus, VIP e Premium) e Área VIP.
+Portal de notícias com **369 veículos** do Brasil e do mundo (reforço na Bahia e em títulos nacionais), atualização diária automática de manchetes, planos pagos (Basic, Pro e Premium) e Área VIP.
 
 ## Como o site se mantém atualizado sozinho
 
